@@ -1381,9 +1381,11 @@ export default function Home() {
               </em>
             </div>
             {(Object.keys(LOVE) as LoveKey[]).map((k, i) => (
-              <div key={k} className={`orbit-tag tag-${i}`}>
-                <b>{LOVE[k].short}</b>
-                <span>{LOVE[k].name}</span>
+              <div key={k} className={`orbit-slot slot-${i}`}>
+                <div className={`orbit-tag tag-${i}`}>
+                  <b>{LOVE[k].short}</b>
+                  <span>{LOVE[k].name}</span>
+                </div>
               </div>
             ))}
           </div>

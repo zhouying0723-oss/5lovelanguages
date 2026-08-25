@@ -263,9 +263,23 @@ nav,
   align-items: center;
   gap: 8px;
   box-shadow: 0 8px 24px rgba(66, 42, 36, 0.08);
+  animation: love-orbit-counter-spin 48s linear infinite;
+}
+.orbit-slot {
+  position: absolute;
+  inset: 0;
+  rotate: 0deg;
+  animation: orbit-pace-shift var(--pace-duration, 10s) ease-in-out infinite
+    alternate;
+  animation-delay: var(--pace-delay, 0s);
+  pointer-events: none;
+}
+.orbit-slot .orbit-tag {
+  rotate: 0deg;
   animation:
     love-orbit-counter-spin 48s linear infinite,
-    love-orbit-breathe var(--drift-duration, 8s) ease-in-out infinite alternate;
+    orbit-pace-counter var(--pace-duration, 10s) ease-in-out infinite alternate;
+  animation-delay: 0s, var(--pace-delay, 0s);
 }
 @keyframes love-orbit-spin {
   to {
@@ -277,12 +291,14 @@ nav,
     transform: rotate(-360deg);
   }
 }
-@keyframes love-orbit-breathe {
-  from {
-    translate: 0 0;
-  }
+@keyframes orbit-pace-shift {
   to {
-    translate: var(--drift-x, 0) var(--drift-y, 0);
+    rotate: var(--pace-angle, 3deg);
+  }
+}
+@keyframes orbit-pace-counter {
+  to {
+    rotate: calc(-1 * var(--pace-angle, 3deg));
   }
 }
 .orbit-tag b {
@@ -302,42 +318,47 @@ nav,
 .tag-0 {
   left: 12px;
   top: 88px;
-  --drift-x: -7px;
-  --drift-y: -5px;
-  --drift-duration: 8.4s;
-  animation-delay: 0s, -2.1s;
 }
 .tag-1 {
   right: -5px;
   top: 75px;
-  --drift-x: 7px;
-  --drift-y: -5px;
-  --drift-duration: 9.2s;
-  animation-delay: 0s, -6.4s;
 }
 .tag-2 {
   right: -20px;
   bottom: 120px;
-  --drift-x: 8px;
-  --drift-y: 3px;
-  --drift-duration: 7.8s;
-  animation-delay: 0s, -4.7s;
 }
 .tag-3 {
   left: 56px;
   bottom: 6px;
-  --drift-x: -3px;
-  --drift-y: 8px;
-  --drift-duration: 9.8s;
-  animation-delay: 0s, -1.3s;
 }
 .tag-4 {
   left: -38px;
   top: 245px;
-  --drift-x: -8px;
-  --drift-y: 1px;
-  --drift-duration: 8.8s;
-  animation-delay: 0s, -7.1s;
+}
+.slot-0 {
+  --pace-angle: 3.4deg;
+  --pace-duration: 10.4s;
+  --pace-delay: -2.1s;
+}
+.slot-1 {
+  --pace-angle: -3.8deg;
+  --pace-duration: 12.2s;
+  --pace-delay: -7.3s;
+}
+.slot-2 {
+  --pace-angle: 3deg;
+  --pace-duration: 9.6s;
+  --pace-delay: -4.8s;
+}
+.slot-3 {
+  --pace-angle: -3.5deg;
+  --pace-duration: 11.4s;
+  --pace-delay: -1.4s;
+}
+.slot-4 {
+  --pace-angle: 3.7deg;
+  --pace-duration: 13s;
+  --pace-delay: -8.6s;
 }
 .promise {
   max-width: 1180px;
@@ -1379,6 +1400,7 @@ nav,
   }
   .love-orbit,
   .orbit-core,
+  .orbit-slot,
   .orbit-tag {
     animation: none !important;
   }
