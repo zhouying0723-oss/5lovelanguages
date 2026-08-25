@@ -63,6 +63,11 @@ systemctl daemon-reload
 systemctl enable --now "$SERVICE"
 systemctl restart "$SERVICE"
 curl --fail --silent http://127.0.0.1:3025/health
-systemctl reload nginx
+if systemctl is-active --quiet nginx; then
+    systemctl reload nginx
+else
+    # Some existing hosts run Nginx directly instead of through systemd.
+    nginx -s reload
+fi
 echo
 echo "匿名统计服务部署完成"

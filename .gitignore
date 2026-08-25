@@ -41,3 +41,4 @@ yarn-error.log*
 /.wrangler/
 /outputs/
 /work/
+/-_(mp3.pm).mp3
