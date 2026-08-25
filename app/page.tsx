@@ -68,18 +68,20 @@ function makeTieGroup(data: ReturnType<typeof calc>, mode: "receive" | "give"): 
 function rankWithTies(data: ReturnType<typeof calc>, choices: LoveKey[], winner?: LoveKey) {
   const votes = Object.fromEntries(Object.keys(LOVE).map(k => [k, 0])) as Record<LoveKey, number>;
   choices.forEach(key => { votes[key] += 1; });
-  return data.map(item => ({ ...item, tieVotes: votes[item.key], tieRecency: choices.lastIndexOf(item.key) })).sort((a, b) => {
+  const ranked = data.map(item => ({ ...item, tieVotes: votes[item.key], tieRecency: choices.lastIndexOf(item.key), adjustedScore: item.score + votes[item.key] * 1.5 + (winner === item.key ? 3 : 0) })).sort((a, b) => {
     if (Math.abs(a.score - b.score) > 2) return b.score - a.score;
     if (winner && (a.key === winner || b.key === winner)) return a.key === winner ? -1 : 1;
     return votes[b.key] - votes[a.key] || b.tieRecency - a.tieRecency || b.score - a.score;
   });
+  const maximum = Math.max(...ranked.map(item => item.adjustedScore));
+  return ranked.map(item => ({ ...item, resultPct: Math.round(item.adjustedScore / maximum * 100) }));
 }
 
 function ResultList({ title, eyebrow, data, mode }: { title: string; eyebrow: string; data: ReturnType<typeof rankWithTies>; mode: "receive" | "give" }) {
   const balanced = data[0].score - data[1].score <= 2 && data[0].tieVotes === data[1].tieVotes && data[0].tieRecency === data[1].tieRecency;
   return <section className="result-card"><span className="result-eyebrow">{eyebrow}</span><h2>{balanced ? "多语言均衡型" : title}</h2>
     <div className="primary-love" style={{ "--accent": LOVE[data[0].key].color } as React.CSSProperties}><div className="rank-mark">01</div><div><strong>{balanced ? `${LOVE[data[0].key].name} · ${LOVE[data[1].key].name}` : LOVE[data[0].key].name}</strong>{data[0].tieVotes > 0 && <em className="tie-badge">决胜后核心偏好</em>}<p>{balanced ? "你的核心偏好非常接近，不必勉强自己只属于一种类型。" : LOVE[data[0].key][mode]}</p></div></div>
-    <div className="bars">{data.map((item, i) => <div className="bar-row" key={item.key}><div className="bar-label"><span>{i + 1}. {LOVE[item.key].name}</span><b>{item.pct}%</b></div><div className="bar-track"><span style={{ width: `${item.pct}%`, background: LOVE[item.key].color }} /></div></div>)}</div>
+    <div className="index-caption">综合相对偏好指数</div><div className="bars">{data.map((item, i) => <div className="bar-row" key={item.key}><div className="bar-label"><span>{i + 1}. {LOVE[item.key].name}</span><b>{item.resultPct}</b></div><div className="bar-track"><span style={{ width: `${item.resultPct}%`, background: LOVE[item.key].color }} /></div></div>)}</div>
   </section>;
 }
 
@@ -98,7 +100,7 @@ export default function Home() {
     const grad = ctx.createLinearGradient(0, 0, 1080, 1440); grad.addColorStop(0, "#fffaf4"); grad.addColorStop(1, "#f4e3dd"); ctx.fillStyle = grad; ctx.fillRect(0, 0, 1080, 1440);
     ctx.fillStyle = "#b95548"; ctx.beginPath(); ctx.arc(920, 125, 240, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "rgba(255,255,255,.13)"; ctx.beginPath(); ctx.arc(860, 160, 135, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#8f443c"; ctx.font = "500 28px 'PingFang SC', sans-serif"; ctx.fillText("爱的五种语言 · 双向测试", 74, 112); ctx.fillStyle = "#382824"; ctx.font = "700 64px 'Songti SC', serif"; ctx.fillText("我的爱，有两种方向", 74, 202); ctx.font = "400 28px 'PingFang SC', sans-serif"; ctx.fillStyle = "#79635c"; ctx.fillText("看见我如何接收爱，也看见我如何给予爱", 76, 254);
-    const card = (y: number, label: string, item: typeof receive[number], copy: string, accent: string) => { ctx.fillStyle = "rgba(255,255,255,.9)"; roundRect(ctx, 64, y, 952, 350, 34); ctx.fill(); ctx.fillStyle = accent; ctx.font = "600 24px 'PingFang SC', sans-serif"; ctx.fillText(label, 110, y + 68); ctx.fillStyle = "#382824"; ctx.font = "700 52px 'Songti SC', serif"; ctx.fillText(LOVE[item.key].name, 110, y + 142); ctx.fillStyle = "#79635c"; ctx.font = "400 25px 'PingFang SC', sans-serif"; wrapText(ctx, copy, 110, y + 200, 820, 40); ctx.fillStyle = "#eadbd4"; roundRect(ctx, 110, y + 292, 800, 16, 8); ctx.fill(); ctx.fillStyle = LOVE[item.key].color; roundRect(ctx, 110, y + 292, 800 * item.pct / 100, 16, 8); ctx.fill(); ctx.fillStyle = "#79635c"; ctx.font = "600 22px sans-serif"; ctx.fillText(`${item.pct}%`, 920, y + 308); };
+    const card = (y: number, label: string, item: typeof receive[number], copy: string, accent: string) => { ctx.fillStyle = "rgba(255,255,255,.9)"; roundRect(ctx, 64, y, 952, 350, 34); ctx.fill(); ctx.fillStyle = accent; ctx.font = "600 24px 'PingFang SC', sans-serif"; ctx.fillText(label, 110, y + 68); ctx.fillStyle = "#382824"; ctx.font = "700 52px 'Songti SC', serif"; ctx.fillText(LOVE[item.key].name, 110, y + 142); ctx.fillStyle = "#79635c"; ctx.font = "400 25px 'PingFang SC', sans-serif"; wrapText(ctx, copy, 110, y + 200, 820, 40); ctx.fillStyle = "#eadbd4"; roundRect(ctx, 110, y + 292, 800, 16, 8); ctx.fill(); ctx.fillStyle = LOVE[item.key].color; roundRect(ctx, 110, y + 292, 800 * item.resultPct / 100, 16, 8); ctx.fill(); ctx.fillStyle = "#79635c"; ctx.font = "600 22px sans-serif"; ctx.fillText(`${item.resultPct}`, 920, y + 308); };
     card(326, "我喜欢这样被爱", receive[0], LOVE[receive[0].key].receive, "#b95548"); card(706, "我愿意这样去爱", give[0], LOVE[give[0].key].give, "#557f70");
     const url = "https://zhouying.cn/5lovelanguages"; const qr = await QRCode.toDataURL(url, { width: 230, margin: 2, color: { dark: "#382824", light: "#fffaf4" } }); const img = new Image(); img.src = qr; await new Promise<void>(resolve => { img.onload = () => resolve(); }); ctx.drawImage(img, 76, 1145, 190, 190);
     ctx.fillStyle = "#382824"; ctx.font = "600 30px 'PingFang SC', sans-serif"; ctx.fillText("扫码，发现你的爱的语言", 300, 1218); ctx.fillStyle = "#79635c"; ctx.font = "400 23px 'PingFang SC', sans-serif"; ctx.fillText("30 道题 · 约 5 分钟 · 不收集个人信息", 300, 1266); ctx.font = "400 20px sans-serif"; ctx.fillText("zhouying.cn/5lovelanguages", 300, 1307); ctx.fillStyle = "#b95548"; ctx.font = "700 28px serif"; ctx.fillText("LOVE FLOWS BOTH WAYS", 74, 1382);
