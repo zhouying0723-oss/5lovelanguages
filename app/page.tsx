@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 
 type LoveKey = "words" | "time" | "gifts" | "acts" | "touch";
+type Answer = LoveKey | "none";
 type Phase = "intro" | "quiz" | "tiebreak" | "result";
 type MatchProfile = { receive: number[]; give: number[] };
 const LOVE_KEYS: LoveKey[] = ["words", "time", "gifts", "acts", "touch"];
@@ -709,7 +710,7 @@ const makeQuestion = (
   ],
 });
 
-const questions: Question[] = [
+export const questionsV2: Question[] = [
   makeQuestion(
     "receive",
     "一个平常的晚上，哪件事更容易让你觉得自己被认真放在心上？",
@@ -952,9 +953,252 @@ const questions: Question[] = [
   ),
 ];
 
-const PROGRESS_KEY = "love_language_quiz_progress_v2";
+const questions: Question[] = [
+  makeQuestion(
+    "receive",
+    "当你完成了一件自己很在意的事情，你更希望对方：",
+    "words",
+    "告诉你：“我知道你为这件事付出了多少，你真的做得很好。”",
+    "time",
+    "坐下来听你讲整个过程，认真问你其中的细节。",
+  ),
+  makeQuestion(
+    "receive",
+    "平日里，哪件事更容易让你觉得自己被放在心上？",
+    "gifts",
+    "对方路过一家店，带回你之前说过想尝的点心。",
+    "acts",
+    "对方记得你一直没空寄快递，主动帮你寄了出去。",
+  ),
+  makeQuestion(
+    "receive",
+    "分开一段时间后再次见面，你更期待：",
+    "touch",
+    "对方走过来，给你一个久违的拥抱。",
+    "words",
+    "对方认真告诉你，这段时间有多想你。",
+  ),
+  makeQuestion(
+    "receive",
+    "最近事情有点多，你更希望对方：",
+    "time",
+    "陪你出去走走，听你说说最近在烦什么。",
+    "acts",
+    "主动帮你处理一件拖了好几天的待办事项。",
+  ),
+  makeQuestion(
+    "receive",
+    "一次开心的约会结束后，哪个瞬间更容易留在你的记忆里？",
+    "gifts",
+    "对方把当天的电影票根收起来，说想留作纪念。",
+    "touch",
+    "回家的路上，对方自然地牵住你的手。",
+  ),
+  makeQuestion(
+    "receive",
+    "如果对方想为你的生日做点什么，你更期待：",
+    "time",
+    "留出完整的一天，陪你做喜欢的事情。",
+    "gifts",
+    "准备一份很符合你喜好的生日礼物。",
+  ),
+  makeQuestion(
+    "receive",
+    "当你最近一直在认真做一件事，哪种回应更让你觉得被理解？",
+    "acts",
+    "对方帮你处理一些其他安排，让你能更专心。",
+    "words",
+    "对方看见你的努力，具体说出欣赏你的地方。",
+  ),
+  makeQuestion(
+    "receive",
+    "一起看完一部很喜欢的电影后，你更希望：",
+    "touch",
+    "两个人靠在一起，安静享受那一刻。",
+    "time",
+    "继续聊聊喜欢的情节和各自的感受。",
+  ),
+  makeQuestion(
+    "receive",
+    "一个悠闲的周末，哪件事更容易让你心里一暖？",
+    "acts",
+    "对方主动帮你装好拖了很久都没处理的东西。",
+    "touch",
+    "对方坐到你身边，让你靠着休息一会儿。",
+  ),
+  makeQuestion(
+    "receive",
+    "如果对方想感谢你最近的付出，你更希望：",
+    "words",
+    "对方认真说出：“我都看到了，也真的很感谢你。”",
+    "gifts",
+    "对方为你准备一件你一直想要的小东西。",
+  ),
+  makeQuestion(
+    "receive",
+    "当你心情低落时，你更希望对方：",
+    "time",
+    "放下手里的事情，让你慢慢把心里的话说完。",
+    "words",
+    "告诉你：“你已经很努力了，不用总对自己这么严格。”",
+  ),
+  makeQuestion(
+    "receive",
+    "下班回家时，哪件事更容易让你感受到对方的惦记？",
+    "acts",
+    "对方已经帮你处理好一件你原本准备回家再做的事。",
+    "gifts",
+    "对方顺路带回你喜欢的饮料或小零食。",
+  ),
+  makeQuestion(
+    "receive",
+    "纪念日当天，你更看重：",
+    "gifts",
+    "一份经过认真挑选、能看出心意的纪念日礼物。",
+    "time",
+    "一段不被工作和手机打断的二人时光。",
+  ),
+  makeQuestion(
+    "receive",
+    "结束忙碌的一周后，你更希望：",
+    "touch",
+    "对方走过来抱抱你，让你放松一会儿。",
+    "acts",
+    "对方提前安排好你原本还需要操心的事情。",
+  ),
+  makeQuestion(
+    "receive",
+    "当你想确认一段关系的温度时，哪种方式更容易让你安心？",
+    "words",
+    "对方明确告诉你：“你对我来说真的很重要。”",
+    "touch",
+    "对方轻轻牵住你的手，或者自然地靠近你。",
+  ),
+  makeQuestion(
+    "give",
+    "对方告诉你一个好消息时，你更常做的是：",
+    "time",
+    "继续追问细节，认真听对方讲事情的来龙去脉。",
+    "words",
+    "直接告诉对方：“我就知道你能做到，你真的很厉害。”",
+  ),
+  makeQuestion(
+    "give",
+    "准备去见对方之前，你更容易想到：",
+    "acts",
+    "有没有什么对方最近觉得麻烦的事情，自己可以顺手帮忙。",
+    "gifts",
+    "要不要给对方带一份喜欢的甜点或者饮料。",
+  ),
+  makeQuestion(
+    "give",
+    "一段时间没见后，你更自然的反应是：",
+    "words",
+    "直接告诉对方：“我这几天真的很想你。”",
+    "touch",
+    "见面时先抱住对方，或者牵起对方的手。",
+  ),
+  makeQuestion(
+    "give",
+    "发现对方最近有点累，你更常做的是：",
+    "acts",
+    "主动接过一件对方还没来得及处理的事情。",
+    "time",
+    "约对方一起散步，听听最近都发生了什么。",
+  ),
+  makeQuestion(
+    "give",
+    "一次开心的约会结束后，你更容易：",
+    "touch",
+    "在分别前给对方一个拥抱。",
+    "gifts",
+    "想把当天拍的照片洗出来，或者做成一份小礼物。",
+  ),
+  makeQuestion(
+    "give",
+    "想给平淡的一天增加一点惊喜，你更可能：",
+    "gifts",
+    "路过花店或甜品店时，买一份对方会喜欢的东西。",
+    "time",
+    "提议一起出门吃饭，留出一个晚上专心相处。",
+  ),
+  makeQuestion(
+    "give",
+    "对方为一件事情忙了很久，你更常做的是：",
+    "words",
+    "告诉对方：“我知道你有多努力，也很佩服你。”",
+    "acts",
+    "主动接手其他安排，让对方能先休息一下。",
+  ),
+  makeQuestion(
+    "give",
+    "周末待在一起时，你更自然会：",
+    "time",
+    "找点两个人都喜欢的事情一起做，边玩边聊天。",
+    "touch",
+    "靠近对方，牵手、依偎或者抱一会儿。",
+  ),
+  makeQuestion(
+    "give",
+    "对方情绪不太好时，你更本能的第一反应是：",
+    "touch",
+    "先抱抱对方，或者安静地陪对方靠一会儿。",
+    "acts",
+    "看看有没有什么现实问题是自己能先解决的。",
+  ),
+  makeQuestion(
+    "give",
+    "出门时看到一件和对方有关的东西，你更可能：",
+    "gifts",
+    "买下来，想着见面时送给对方。",
+    "words",
+    "发消息告诉对方：“看到这个，我一下就想到你了。”",
+  ),
+  makeQuestion(
+    "give",
+    "在一个普通的晚上，你更常用哪种方式表达爱意？",
+    "words",
+    "直接说出感谢、喜欢，或者自己欣赏对方的地方。",
+    "time",
+    "把手机放到一边，专心陪对方聊聊天。",
+  ),
+  makeQuestion(
+    "give",
+    "知道对方最近在期待某样东西，你更可能：",
+    "gifts",
+    "悄悄记下来，找机会买给对方。",
+    "acts",
+    "留意对方眼下有没有更需要帮忙处理的事情。",
+  ),
+  makeQuestion(
+    "give",
+    "如果想认真庆祝一个属于你们的日子，你更倾向：",
+    "time",
+    "安排一次两个人都能投入其中的约会。",
+    "gifts",
+    "挑一份和你们共同经历有关的纪念品。",
+  ),
+  makeQuestion(
+    "give",
+    "对方忙了一整天，终于停下来时，你更常做的是：",
+    "acts",
+    "帮对方处理还没完成的事情，让对方早点休息。",
+    "touch",
+    "走过去抱抱对方，或者陪对方安静靠一会儿。",
+  ),
+  makeQuestion(
+    "give",
+    "想让对方感受到你的喜欢，你更自然会：",
+    "touch",
+    "牵住对方的手，或者主动靠近对方。",
+    "words",
+    "清楚地告诉对方：“我真的很喜欢和你在一起。”",
+  ),
+];
+
+const PROGRESS_KEY = "love_language_quiz_progress_v3";
 type SavedProgress = {
-  answers: Array<LoveKey | null>;
+  answers: Array<Answer | null>;
   index: number;
   attemptId: string;
 };
@@ -967,7 +1211,8 @@ function loadSavedProgress(): SavedProgress | null {
       !parsed ||
       parsed.answers.length !== questions.length ||
       !parsed.answers.every(
-        (answer) => answer === null || LOVE_KEYS.includes(answer),
+        (answer) =>
+          answer === null || answer === "none" || LOVE_KEYS.includes(answer),
       ) ||
       !Number.isInteger(parsed.index) ||
       parsed.index < 0 ||
@@ -1000,13 +1245,13 @@ const tieCopy: Record<"receive" | "give", Record<LoveKey, string>> = {
   },
 };
 
-function calc(answers: Array<LoveKey | null>, mode: "receive" | "give") {
+function calc(answers: Array<Answer | null>, mode: "receive" | "give") {
   const totals = Object.fromEntries(
     Object.keys(LOVE).map((k) => [k, 0]),
   ) as Record<LoveKey, number>;
   questions.forEach((q, i) => {
     const key = answers[i];
-    if (q.mode === mode && key) totals[key] += 1;
+    if (q.mode === mode && key && key !== "none") totals[key] += 1;
   });
   return (Object.keys(LOVE) as LoveKey[])
     .map((key) => ({
@@ -1185,7 +1430,7 @@ function rankWithTies(
         b.score - a.score
       );
     });
-  const maximum = Math.max(...ranked.map((item) => item.adjustedScore));
+  const maximum = Math.max(...ranked.map((item) => item.adjustedScore), 1);
   return ranked.map((item) => ({
     ...item,
     resultPct: Math.round((item.adjustedScore / maximum) * 100),
@@ -1204,7 +1449,10 @@ function ResultList({
   mode: "receive" | "give";
 }) {
   const leaders = data.filter((item) => item.score === data[0].score);
-  const total = data.reduce((sum, item) => sum + item.score, 0) || 1;
+  const chosenTotal = data.reduce((sum, item) => sum + item.score, 0);
+  const total = chosenTotal || 1;
+  const neutralCount = 15 - chosenTotal;
+  const lowSignal = chosenTotal <= 7 || data[0].score <= 2;
   const gradient = data
     .reduce<{ end: number; segments: string[] }>(
       (result, item) => {
@@ -1223,37 +1471,52 @@ function ResultList({
   return (
     <section className="result-card">
       <span className="result-eyebrow">{eyebrow}</span>
-      <h2>{leaders.length > 1 ? "并列核心偏好" : title}</h2>
+      <h2>
+        {lowSignal
+          ? "偏好尚未集中"
+          : leaders.length > 1
+            ? "并列核心偏好"
+            : title}
+      </h2>
       <div
         className="primary-love"
         style={
           {
             "--accent":
-              leaders.length > 1 ? "#b95548" : LOVE[data[0].key].color,
+              lowSignal || leaders.length > 1
+                ? "#b95548"
+                : LOVE[data[0].key].color,
           } as React.CSSProperties
         }
       >
-        <div className="rank-mark">{leaders.length > 1 ? "=" : "01"}</div>
+        <div className="rank-mark">
+          {lowSignal ? "?" : leaders.length > 1 ? "=" : "01"}
+        </div>
         <div>
           <strong>
-            {leaders.map((item) => LOVE[item.key].name).join(" · ")}
+            {lowSignal
+              ? "目前没有表现出特别明显的单一偏好"
+              : leaders.map((item) => LOVE[item.key].name).join(" · ")}
           </strong>
           <p>
-            {leaders.length > 1
-              ? `这 ${leaders.length} 项得分相同，共同构成你的核心偏好，不必从中强行选出第一名。`
-              : LOVE[data[0].key][mode]}
+            {lowSignal
+              ? "你感受到或表达爱，可能更依赖具体情境，现有选项也可能没有充分覆盖你真正重视的方式。"
+              : leaders.length > 1
+                ? `这 ${leaders.length} 项得分相同，共同构成你的核心偏好，不必从中强行选出第一名。`
+                : LOVE[data[0].key][mode]}
           </p>
         </div>
       </div>
       <div className="pie-result">
         <div
           className="pie-chart"
-          style={{ background: `conic-gradient(${gradient})` }}
+          style={{
+            background: chosenTotal ? `conic-gradient(${gradient})` : "#f0e5df",
+          }}
         >
           <span>
-            共 {total}
-            <br />
-            次选择
+            已选择 {chosenTotal}
+            <br />C 选项 {neutralCount}
           </span>
         </div>
         <div className="pie-legend">
@@ -1261,7 +1524,7 @@ function ResultList({
             <div key={item.key}>
               <i style={{ background: LOVE[item.key].color }} />
               <span>{LOVE[item.key].name}</span>
-              <b>{Math.round((item.score / total) * 100)}%</b>
+              <b>{item.score} 分</b>
             </div>
           ))}
         </div>
@@ -1280,6 +1543,10 @@ function DetailedReport({
   const receiveMain = receive[0].key;
   const giveMain = give[0].key;
   const personal = PERSONAL_RESULT[`${receiveMain}-${giveMain}`];
+  const receiveTotal = receive.reduce((sum, item) => sum + item.score, 0);
+  const giveTotal = give.reduce((sum, item) => sum + item.score, 0);
+  const receiveLowSignal = receiveTotal <= 7 || receive[0].score <= 2;
+  const giveLowSignal = giveTotal <= 7 || give[0].score <= 2;
   const receiveLeaders = receive.filter(
     (item) => item.score === receive[0].score,
   );
@@ -1300,20 +1567,39 @@ function DetailedReport({
         <h2>你的双向爱语报告</h2>
         <p>分数代表当下的相对偏好，不是能力高低，也不是固定不变的人格标签。</p>
       </div>
-      {!receiveLeaders.slice(1).length && !giveLeaders.slice(1).length && (
-        <div className="personal-summary">
-          <small>你的个人测评结论</small>
-          <h3>{personal.title}</h3>
-          <p>{personal.body}</p>
+      {!receiveLowSignal &&
+        !giveLowSignal &&
+        !receiveLeaders.slice(1).length &&
+        !giveLeaders.slice(1).length && (
+          <div className="personal-summary">
+            <small>你的个人测评结论</small>
+            <h3>{personal.title}</h3>
+            <p>{personal.body}</p>
+          </div>
+        )}
+      {(receiveLowSignal || giveLowSignal) && (
+        <div className="personal-summary low-signal-summary">
+          <small>关于这次结果</small>
+          <h3>你的偏好可能更依赖具体情境</h3>
+          <p>
+            你选择了较多“这两种都不太符合”，因此这次结果不强行用单一类型概括你。这不是漏答，也不是测试失败；它说明现有场景可能没有充分覆盖你真正看重的表达方式。
+          </p>
         </div>
       )}
       <div className="report-grid">
         <article>
           <small>01 · 内在需要</small>
           <h3>
-            {receiveLeaders.map((item) => LOVE[item.key].name).join(" · ")}
+            {receiveLowSignal
+              ? "暂未出现明显的单一偏好"
+              : receiveLeaders.map((item) => LOVE[item.key].name).join(" · ")}
           </h3>
-          {receiveLeaders.length > 1 ? (
+          {receiveLowSignal ? (
+            <p>
+              你在“期待怎样被爱”部分选择了 {15 - receiveTotal} 次
+              C。你的需要可能更依赖具体情境，或者还有其他重要方式没有被这些题目覆盖。
+            </p>
+          ) : receiveLeaders.length > 1 ? (
             <p>
               这些偏好得分相同。你可能需要多种方式共同出现，才能更完整地感受到爱；具体需要也会随情境变化。
             </p>
@@ -1327,8 +1613,17 @@ function DetailedReport({
         </article>
         <article>
           <small>02 · 自然表达</small>
-          <h3>{giveLeaders.map((item) => LOVE[item.key].name).join(" · ")}</h3>
-          {giveLeaders.length > 1 ? (
+          <h3>
+            {giveLowSignal
+              ? "暂未出现明显的单一偏好"
+              : giveLeaders.map((item) => LOVE[item.key].name).join(" · ")}
+          </h3>
+          {giveLowSignal ? (
+            <p>
+              你在“习惯怎样去爱”部分选择了 {15 - giveTotal} 次
+              C。你的表达方式可能随对象和场景变化，不适合被强行归入单一类型。
+            </p>
+          ) : giveLeaders.length > 1 ? (
             <p>
               这些表达方式得分相同。你会根据对方和场景，自然地在多种爱语之间切换，不需要定义唯一的主要方式。
             </p>
@@ -1369,24 +1664,30 @@ function DetailedReport({
           <li>我做过什么，让你感到被理解或被支持？</li>
           <li>这周我们可以各做一件什么具体的小事？</li>
         </ol>
-        <div className="conflict-guide">
-          <small>发生矛盾以后</small>
-          <h3>{CONFLICT_GUIDE[receiveMain].need}</h3>
-          <p>
-            <b>更适合的回应：</b>“{CONFLICT_GUIDE[receiveMain].response}”
-          </p>
-          <p>
-            <b>尽量避免：</b>
-            {CONFLICT_GUIDE[receiveMain].avoid}
-          </p>
-          <blockquote>“{CONFLICT_GUIDE[receiveMain].request}”</blockquote>
-        </div>
+        {!receiveLowSignal && (
+          <div className="conflict-guide">
+            <small>发生矛盾以后</small>
+            <h3>{CONFLICT_GUIDE[receiveMain].need}</h3>
+            <p>
+              <b>更适合的回应：</b>“{CONFLICT_GUIDE[receiveMain].response}”
+            </p>
+            <p>
+              <b>尽量避免：</b>
+              {CONFLICT_GUIDE[receiveMain].avoid}
+            </p>
+            <blockquote>“{CONFLICT_GUIDE[receiveMain].request}”</blockquote>
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
 export default function Home() {
+  const inviteShareReady = useMemo(
+    () => new URLSearchParams(window.location.search).get("invite") === "ready",
+    [],
+  );
   const inviterProfile = useMemo(
     () =>
       decodeProfile(new URLSearchParams(window.location.search).get("match")),
@@ -1395,7 +1696,7 @@ export default function Home() {
   const savedProgress = useMemo(() => loadSavedProgress(), []);
   const [phase, setPhase] = useState<Phase>("intro");
   const [index, setIndex] = useState(savedProgress?.index ?? 0);
-  const [answers, setAnswers] = useState<Array<LoveKey | null>>(
+  const [answers, setAnswers] = useState<Array<Answer | null>>(
     savedProgress?.answers ?? Array(questions.length).fill(null),
   );
   const [hasSavedProgress, setHasSavedProgress] = useState(
@@ -1414,7 +1715,6 @@ export default function Home() {
   const [posterOpen, setPosterOpen] = useState(false);
   const [posterUrl, setPosterUrl] = useState("");
   const [shareHint, setShareHint] = useState("");
-  const [matchHint, setMatchHint] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const attemptIdRef = useRef(savedProgress?.attemptId ?? "");
   const completionTrackedRef = useRef(false);
@@ -1482,7 +1782,7 @@ export default function Home() {
     if (phase === "quiz" || phase === "tiebreak")
       window.scrollTo({ top: 0, behavior: "smooth" });
   }, [index, tieGroupIndex, tieOpponentIndex, phase]);
-  const choose = (key: LoveKey) => {
+  const choose = (key: Answer) => {
     const next = [...answers];
     next[index] = key;
     setAnswers(next);
@@ -1513,7 +1813,7 @@ export default function Home() {
     }, 180);
   };
   const beginFreshQuiz = () => {
-    const freshAnswers = Array<LoveKey | null>(questions.length).fill(null);
+    const freshAnswers = Array<Answer | null>(questions.length).fill(null);
     setAnswers(freshAnswers);
     setIndex(0);
     attemptIdRef.current = crypto.randomUUID();
@@ -1583,7 +1883,9 @@ export default function Home() {
       const leaders = data.filter((item) => item.score === data[0].score);
       const secondary =
         leaders.length === 1 && data[1].score > data[2].score ? data[1] : null;
-      const total = data.reduce((sum, item) => sum + item.score, 0) || 1;
+      const chosenTotal = data.reduce((sum, item) => sum + item.score, 0);
+      const total = chosenTotal || 1;
+      const lowSignal = chosenTotal <= 7 || data[0].score <= 2;
       ctx.fillStyle = "rgba(255,255,255,.9)";
       roundRect(ctx, 64, y, 952, 360, 34);
       ctx.fill();
@@ -1594,7 +1896,9 @@ export default function Home() {
       ctx.font = `700 ${leaders.length > 2 ? 31 : 42}px 'Songti SC', serif`;
       wrapText(
         ctx,
-        leaders.map((item) => LOVE[item.key].name).join(" · "),
+        lowSignal
+          ? "偏好尚未集中"
+          : leaders.map((item) => LOVE[item.key].name).join(" · "),
         110,
         y + 128,
         540,
@@ -1604,9 +1908,11 @@ export default function Home() {
       ctx.font = "400 22px 'PingFang SC', sans-serif";
       wrapText(
         ctx,
-        leaders.length > 1
-          ? "并列核心偏好：这些方式对我同样重要，不作单独排序。"
-          : copy,
+        lowSignal
+          ? "这次选择了较多 C，感受爱可能更依赖具体情境。"
+          : leaders.length > 1
+            ? "并列核心偏好：这些方式对我同样重要，不作单独排序。"
+            : copy,
         110,
         y + 200,
         525,
@@ -1614,9 +1920,11 @@ export default function Home() {
       );
       ctx.font = "500 19px 'PingFang SC', sans-serif";
       ctx.fillText(
-        secondary
-          ? `第二偏好 · ${LOVE[secondary.key].name}`
-          : "其余偏好较接近，不单独排序",
+        lowSignal
+          ? `明确选择 C · ${15 - chosenTotal} 次`
+          : secondary
+            ? `第二偏好 · ${LOVE[secondary.key].name}`
+            : "其余偏好较接近，不单独排序",
         110,
         y + 318,
       );
@@ -1638,7 +1946,7 @@ export default function Home() {
       ctx.fillStyle = "#79635c";
       ctx.textAlign = "center";
       ctx.font = "500 17px 'PingFang SC', sans-serif";
-      ctx.fillText("选择占比", 830, y + 171);
+      ctx.fillText(`C ${15 - chosenTotal}次`, 830, y + 171);
       const legendX = [700, 815, 930, 755, 875];
       data.forEach((item, i) => {
         const yy = y + (i < 3 ? 282 : 312);
@@ -1649,11 +1957,7 @@ export default function Home() {
         ctx.fillStyle = "#79635c";
         ctx.textAlign = "left";
         ctx.font = "500 16px 'PingFang SC', sans-serif";
-        ctx.fillText(
-          `${LOVE[item.key].short} ${Math.round((item.score / total) * 100)}%`,
-          legendX[i],
-          yy,
-        );
+        ctx.fillText(`${LOVE[item.key].short} ${item.score}分`, legendX[i], yy);
       });
       ctx.textAlign = "left";
     };
@@ -1903,7 +2207,7 @@ export default function Home() {
       "请长按上方海报保存到相册，再打开朋友圈选择这张图片发布。微信内也可点击右上角“…”分享到朋友圈。",
     );
   };
-  const shareMatchInvite = async () => {
+  const shareMatchInvite = () => {
     const profile: MatchProfile = {
       receive: LOVE_KEYS.map(
         (key) => receive.find((item) => item.key === key)?.score ?? 0,
@@ -1916,23 +2220,40 @@ export default function Home() {
     url.search = "";
     url.hash = "";
     url.searchParams.set("match", encodeProfile(profile));
-    const shareData = {
-      title: "和我一起测爱的五种语言",
-      text: "我已经完成测试，邀请你来看看我们怎样更好地接住彼此。",
-      url: url.toString(),
-    };
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-        setMatchHint("邀请已分享，等对方完成后即可看到双人指南。");
-        return;
-      } catch (error) {
-        if ((error as DOMException).name === "AbortError") return;
-      }
-    }
-    await navigator.clipboard.writeText(url.toString());
-    setMatchHint("邀请链接已复制，可以发给另一半了。");
+    url.searchParams.set("invite", "ready");
+    window.location.assign(url.toString());
   };
+  const beginInvitedQuiz = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("invite");
+    window.location.replace(url.toString());
+  };
+
+  if (inviteShareReady && inviterProfile)
+    return (
+      <main className="invite-share-page">
+        <nav>
+          <div className="brand">
+            <LoveMark /> 爱的五种语言
+          </div>
+          <div className="nav-note">双向关系自测</div>
+        </nav>
+        <section className="invite-share-card">
+          <div className="invite-share-icon">↗</div>
+          <p>LOVE, TOGETHER</p>
+          <h1>邀请链接已经准备好了</h1>
+          <strong>请点击微信右上角“…”并选择“发送给朋友”</strong>
+          <span>
+            好友打开后完成同一组测试，就会生成你们的双向爱语默契度与相处指南。
+          </span>
+          <div className="invite-share-divider" />
+          <small>如果你是收到邀请的人</small>
+          <button className="primary" onClick={beginInvitedQuiz}>
+            开始我的测试 <span>→</span>
+          </button>
+        </section>
+      </main>
+    );
 
   if (phase === "intro")
     return (
@@ -1976,13 +2297,14 @@ export default function Home() {
               </div>
             )}
             <div className="answer-guide">
-              每题选择更接近真实感受的一项；如果都符合，选择更能打动你或你更常做的那个。答案没有对错，身体接触默认双方都愿意且舒适。
+              每题的 A、B 代表两种爱的表达，C 代表两种都不太符合。如果 A、B
+              都符合，选择更能打动你或你更常做的那个。答案没有对错，身体接触默认双方都愿意且舒适。
             </div>
             <button className="primary" onClick={startQuiz}>
               {hasSavedProgress ? "继续上次测试" : "开始探索"} <span>→</span>
             </button>
             <div className="meta">
-              <span>30 道情境二选一</span>
+              <span>30 道情境三选一</span>
               <i />
               <span>约 5 分钟</span>
               <i />
@@ -2061,7 +2383,7 @@ export default function Home() {
           <div
             className="binary-options"
             role="group"
-            aria-label="请选择更符合你的一项"
+            aria-label="请选择更符合你的一项，也可以选择两种都不符合"
           >
             {q.options.map((option, optionIndex) => (
               <button
@@ -2076,6 +2398,20 @@ export default function Home() {
                 <span>选择这一项 →</span>
               </button>
             ))}
+            <button
+              type="button"
+              aria-pressed={answers[index] === "none"}
+              className={`neutral-choice ${answers[index] === "none" ? "selected" : ""}`}
+              onClick={() => choose("none")}
+            >
+              <small>C</small>
+              <strong>
+                {q.mode === "receive"
+                  ? "这两种都不太能打动我。"
+                  : "这两种都不是我常用的表达方式。"}
+              </strong>
+              <span>选择这一项 →</span>
+            </button>
           </div>
           <p className="choice-note">
             {q.mode === "receive"
@@ -2157,12 +2493,21 @@ export default function Home() {
   const giveLeaders = give.filter((item) => item.score === give[0].score);
   const hasTiedCore = receiveLeaders.length > 1 || giveLeaders.length > 1;
   const personalResult = PERSONAL_RESULT[`${receive[0].key}-${give[0].key}`];
-  const relationshipTitle = hasTiedCore
-    ? "你的核心偏好不止一种。"
-    : personalResult.title;
-  const relationshipCopy = hasTiedCore
-    ? `你在${receiveLeaders.length > 1 ? "接收爱" : "表达爱"}的方向上出现并列核心偏好。它们同样重要，不需要从中强行挑出一个代表你。`
-    : personalResult.body;
+  const resultLowSignal =
+    receive.reduce((sum, item) => sum + item.score, 0) <= 7 ||
+    give.reduce((sum, item) => sum + item.score, 0) <= 7 ||
+    receive[0].score <= 2 ||
+    give[0].score <= 2;
+  const relationshipTitle = resultLowSignal
+    ? "这次结果更像一张情境地图，而不是单一标签。"
+    : hasTiedCore
+      ? "你的核心偏好不止一种。"
+      : personalResult.title;
+  const relationshipCopy = resultLowSignal
+    ? "你明确选择了较多“都不符合”。你感受和表达爱，可能更取决于对象、关系阶段与当下情境，也可能有测试尚未覆盖的重要方式。"
+    : hasTiedCore
+      ? `你在${receiveLeaders.length > 1 ? "接收爱" : "表达爱"}的方向上出现并列核心偏好。它们同样重要，不需要从中强行挑出一个代表你。`
+      : personalResult.body;
   return (
     <main className="result-page">
       <header className="result-head">
@@ -2214,7 +2559,6 @@ export default function Home() {
             <span>
               对方完成测试后，将生成双向默契度、容易契合与需要翻译的地方，以及具体相处指南。
             </span>
-            {matchHint && <em>{matchHint}</em>}
           </div>
           <button className="primary" onClick={shareMatchInvite}>
             邀请另一半测匹配度 <span>↗</span>
