@@ -1294,29 +1294,20 @@ export default function Home() {
   };
   const shareToWechatFriend = async () => {
     const isWechat = /MicroMessenger/i.test(navigator.userAgent);
-    if (isWechat) {
-      setShareHint("请点击微信右上角“…”并选择“发送给朋友”。");
-      return;
-    }
     const url = `${window.location.origin}${window.location.pathname}`;
-    const shareData = {
-      title: "爱的五种语言",
-      text: "和我一起发现，我们怎样接收爱，也怎样把爱送到彼此心里。",
-      url,
-    };
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-        return;
-      } catch (error) {
-        if ((error as DOMException).name === "AbortError") return;
-      }
-    }
     try {
       await navigator.clipboard.writeText(url);
-      setShareHint("链接已复制，可以粘贴发送给微信好友。");
+      setShareHint(
+        isWechat
+          ? "链接已复制。也可以点击微信右上角“…”并选择“发送给朋友”。"
+          : "链接已复制，请打开微信并粘贴发送给好友。这样不会再出现分享弹层提前收起的问题。",
+      );
     } catch {
-      setShareHint("请复制当前网页地址，发送给微信好友。");
+      setShareHint(
+        isWechat
+          ? "请点击微信右上角“…”并选择“发送给朋友”。"
+          : "请复制当前网页地址，再打开微信发送给好友。",
+      );
     }
   };
   const showMomentsGuide = () => {
