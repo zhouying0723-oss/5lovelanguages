@@ -1292,26 +1292,36 @@ export default function Home() {
     a.click();
     setShareHint("图片已下载；可从相册或下载目录选择它进行分享。");
   };
-  const sharePoster = async () => {
-    if (!posterUrl) return;
-    const file = await posterFile();
-    if (
-      navigator.share &&
-      (!navigator.canShare || navigator.canShare({ files: [file] }))
-    ) {
+  const shareToWechatFriend = async () => {
+    const isWechat = /MicroMessenger/i.test(navigator.userAgent);
+    if (isWechat) {
+      setShareHint("请点击微信右上角“…”并选择“发送给朋友”。");
+      return;
+    }
+    const url = `${window.location.origin}${window.location.pathname}`;
+    const shareData = {
+      title: "爱的五种语言",
+      text: "和我一起发现，我们怎样接收爱，也怎样把爱送到彼此心里。",
+      url,
+    };
+    if (navigator.share) {
       try {
-        await navigator.share({
-          title: "我的爱的语言",
-          text: "这是我的双向爱语报告",
-          files: [file],
-        });
+        await navigator.share(shareData);
         return;
       } catch (error) {
         if ((error as DOMException).name === "AbortError") return;
       }
     }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareHint("链接已复制，可以粘贴发送给微信好友。");
+    } catch {
+      setShareHint("请复制当前网页地址，发送给微信好友。");
+    }
+  };
+  const showMomentsGuide = () => {
     setShareHint(
-      "微信暂不允许网页直接发布朋友圈。请长按海报保存图片，再从朋友圈选择该图片发布。 ",
+      "请长按上方海报保存到相册，再打开朋友圈选择这张图片发布。微信内也可点击右上角“…”分享到朋友圈。",
     );
   };
   const shareMatchInvite = async () => {
@@ -1660,9 +1670,29 @@ export default function Home() {
             <canvas ref={canvasRef} className="poster-canvas" />
             {posterUrl && <img src={posterUrl} alt="我的爱的语言分享海报" />}
             <div>
-              <button className="primary" onClick={sharePoster}>
-                分享海报
-              </button>
+              <div className="share-channels">
+                <button onClick={shareToWechatFriend}>
+                  <span className="channel-icon friend-icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32">
+                      <path d="M14 7C8.5 7 4 10.4 4 14.6c0 2.3 1.4 4.4 3.6 5.8l-.8 3 3.5-1.7c1.2.3 2.4.5 3.7.5 5.5 0 10-3.4 10-7.6S19.5 7 14 7Z" />
+                      <path d="M19.3 13.2c4.8 0 8.7 3 8.7 6.8 0 2-1.1 3.8-3 5.1l.7 2.5-3-1.4c-1.1.3-2.2.4-3.4.4-4.8 0-8.7-3-8.7-6.7" />
+                    </svg>
+                  </span>
+                  <span>微信好友</span>
+                </button>
+                <button onClick={showMomentsGuide}>
+                  <span
+                    className="channel-icon moments-icon"
+                    aria-hidden="true"
+                  >
+                    <svg viewBox="0 0 32 32">
+                      <circle cx="16" cy="16" r="10.5" />
+                      <path d="M16 5.5 20.2 16 16 26.5 11.8 16 16 5.5ZM5.5 16 16 11.8 26.5 16 16 20.2 5.5 16Z" />
+                    </svg>
+                  </span>
+                  <span>朋友圈</span>
+                </button>
+              </div>
               <button className="poster-download" onClick={download}>
                 {isiOS ? "存储到照片" : "保存图片"}
               </button>
