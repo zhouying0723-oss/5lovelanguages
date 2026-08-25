@@ -952,6 +952,37 @@ const questions: Question[] = [
   ),
 ];
 
+const PROGRESS_KEY = "love_language_quiz_progress_v2";
+type SavedProgress = {
+  answers: Array<LoveKey | null>;
+  index: number;
+  attemptId: string;
+};
+function loadSavedProgress(): SavedProgress | null {
+  try {
+    const parsed = JSON.parse(
+      localStorage.getItem(PROGRESS_KEY) || "null",
+    ) as SavedProgress | null;
+    if (
+      !parsed ||
+      parsed.answers.length !== questions.length ||
+      !parsed.answers.every(
+        (answer) => answer === null || LOVE_KEYS.includes(answer),
+      ) ||
+      !Number.isInteger(parsed.index) ||
+      parsed.index < 0 ||
+      parsed.index >= questions.length ||
+      !parsed.answers.some(Boolean) ||
+      parsed.answers.every(Boolean) ||
+      !/^[a-zA-Z0-9-]{8,80}$/.test(parsed.attemptId)
+    )
+      return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 const tieCopy: Record<"receive" | "give", Record<LoveKey, string>> = {
   receive: {
     words: "听到对方真诚说出欣赏、感谢与鼓励",
@@ -1361,10 +1392,14 @@ export default function Home() {
       decodeProfile(new URLSearchParams(window.location.search).get("match")),
     [],
   );
+  const savedProgress = useMemo(() => loadSavedProgress(), []);
   const [phase, setPhase] = useState<Phase>("intro");
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(savedProgress?.index ?? 0);
   const [answers, setAnswers] = useState<Array<LoveKey | null>>(
-    Array(questions.length).fill(null),
+    savedProgress?.answers ?? Array(questions.length).fill(null),
+  );
+  const [hasSavedProgress, setHasSavedProgress] = useState(
+    Boolean(savedProgress),
   );
   const [tieGroupIndex, setTieGroupIndex] = useState(0);
   const [tieOpponentIndex, setTieOpponentIndex] = useState(1);
@@ -1381,7 +1416,7 @@ export default function Home() {
   const [shareHint, setShareHint] = useState("");
   const [matchHint, setMatchHint] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const attemptIdRef = useRef("");
+  const attemptIdRef = useRef(savedProgress?.attemptId ?? "");
   const completionTrackedRef = useRef(false);
   const rawReceive = useMemo(() => calc(answers, "receive"), [answers]);
   const rawGive = useMemo(() => calc(answers, "give"), [answers]);
@@ -1415,7 +1450,24 @@ export default function Home() {
     trackEvent("page_view");
   }, []);
   useEffect(() => {
+    if (phase !== "quiz" || !attemptIdRef.current) return;
+    try {
+      localStorage.setItem(
+        PROGRESS_KEY,
+        JSON.stringify({ answers, index, attemptId: attemptIdRef.current }),
+      );
+    } catch {
+      // Private browsing or storage restrictions should not block the test.
+    }
+  }, [phase, answers, index]);
+  useEffect(() => {
     if (phase !== "result" || completionTrackedRef.current) return;
+    try {
+      localStorage.removeItem(PROGRESS_KEY);
+    } catch {
+      // Ignore storage restrictions.
+    }
+    setHasSavedProgress(false);
     completionTrackedRef.current = true;
     trackEvent("quiz_complete", attemptIdRef.current, {
       receive: receive.map((item) => ({
@@ -1460,15 +1512,25 @@ export default function Home() {
       } else setPhase("result");
     }, 180);
   };
-  const startQuiz = () => {
+  const beginFreshQuiz = () => {
+    const freshAnswers = Array<LoveKey | null>(questions.length).fill(null);
+    setAnswers(freshAnswers);
+    setIndex(0);
     attemptIdRef.current = crypto.randomUUID();
     completionTrackedRef.current = false;
+    setHasSavedProgress(false);
     trackEvent("quiz_start", attemptIdRef.current);
     setPhase("quiz");
   };
+  const startQuiz = () => {
+    if (hasSavedProgress) {
+      completionTrackedRef.current = false;
+      setPhase("quiz");
+      return;
+    }
+    beginFreshQuiz();
+  };
   const restart = () => {
-    setAnswers(Array(questions.length).fill(null));
-    setIndex(0);
     setTieGroupIndex(0);
     setTieOpponentIndex(1);
     setTieChampion(null);
@@ -1477,7 +1539,7 @@ export default function Home() {
     setPosterOpen(false);
     setPosterUrl("");
     setShareHint("");
-    startQuiz();
+    beginFreshQuiz();
   };
   const createPoster = async () => {
     trackEvent("poster_generate", attemptIdRef.current);
@@ -1902,11 +1964,22 @@ export default function Home() {
                 </span>
               </div>
             )}
+            {hasSavedProgress && (
+              <div className="resume-notice">
+                <div>
+                  <b>上次答到了第 {index + 1} 题</b>
+                  <span>进度只保存在这台设备，不会上传逐题答案。</span>
+                </div>
+                <button type="button" onClick={beginFreshQuiz}>
+                  重新开始
+                </button>
+              </div>
+            )}
             <div className="answer-guide">
               每题选择更接近真实感受的一项；如果都符合，选择更能打动你或你更常做的那个。答案没有对错，身体接触默认双方都愿意且舒适。
             </div>
             <button className="primary" onClick={startQuiz}>
-              开始探索 <span>→</span>
+              {hasSavedProgress ? "继续上次测试" : "开始探索"} <span>→</span>
             </button>
             <div className="meta">
               <span>30 道情境二选一</span>
