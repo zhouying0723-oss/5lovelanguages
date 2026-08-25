@@ -8,5 +8,11 @@ export default defineConfig({
   build: {
     outDir: "../static-dist",
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: "static/index.html",
+        admin: "static/admin/index.html",
+      },
+    },
   },
 });

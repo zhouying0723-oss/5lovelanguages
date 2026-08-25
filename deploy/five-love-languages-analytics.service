@@ -1,0 +1,15 @@
+[Unit]
+Description=Five Love Languages Analytics
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/zhouying.cn/5lovelanguages-api
+EnvironmentFile=/var/www/zhouying.cn/5lovelanguages-api/.env
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=3
+User=root
+
+[Install]
+WantedBy=multi-user.target
