@@ -3,11 +3,11 @@ import { createRoot } from "react-dom/client";
 import "./admin.css";
 
 const names: Record<string, string> = {
-  words: "肯定的言词",
-  time: "精心的时刻",
+  words: "肯定言语",
+  time: "专注陪伴",
   gifts: "用心的礼物",
-  acts: "服务的行动",
-  touch: "身体的接触",
+  acts: "实际行动",
+  touch: "身体接触",
 };
 type Summary = {
   totals: Record<string, number>;

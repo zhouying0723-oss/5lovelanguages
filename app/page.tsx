@@ -55,18 +55,18 @@ const LOVE: Record<
   }
 > = {
   words: {
-    name: "肯定的言词",
-    short: "言词",
+    name: "肯定言语",
+    short: "言语",
     color: "#d96d62",
-    desc: "真诚的赞美、感谢与鼓励，让爱被清楚地说出来。",
+    desc: "爱被明确说出来：感谢、欣赏、鼓励、想念和喜欢。",
     receive: "你在意对方是否把欣赏与关心说出口。",
     give: "你习惯用鼓励、感谢和真诚表达支持别人。",
   },
   time: {
-    name: "精心的时刻",
+    name: "专注陪伴",
     short: "陪伴",
     color: "#9c6b92",
-    desc: "放下干扰，专注地陪伴、倾听与共同经历。",
+    desc: "爱表现为认真在场：倾听、共同经历和不被打扰的相处。",
     receive: "全心投入的陪伴，会让你感到自己被珍视。",
     give: "你愿意留出完整时间，认真进入对方的世界。",
   },
@@ -74,15 +74,15 @@ const LOVE: Record<
     name: "用心的礼物",
     short: "礼物",
     color: "#c18a45",
-    desc: "不在价格，而在“我看见你、也记得你”的心意。",
+    desc: "爱通过具体心意被留下：小礼物、纪念品、卡片和被记住的喜好。",
     receive: "有纪念意义的小物，会让你感到被放在心上。",
     give: "你常用挑选、制作或带回一份心意表达惦念。",
   },
   acts: {
-    name: "服务的行动",
+    name: "实际行动",
     short: "行动",
     color: "#557f70",
-    desc: "以实际行动分担、照顾，让承诺变成可感知的支持。",
+    desc: "爱落在具体生活里：主动帮忙、承担事务和减轻现实负担。",
     receive: "有人主动分担和解决实际问题，会令你安心。",
     give: "你擅长用可靠的行动照顾对方的现实需要。",
   },
@@ -90,7 +90,7 @@ const LOVE: Record<
     name: "身体的接触",
     short: "接触",
     color: "#ad6a74",
-    desc: "在尊重边界与彼此同意下，以拥抱、牵手传递亲近。",
+    desc: "爱通过双方都舒适的身体靠近传递：拥抱、牵手和依偎。",
     receive: "安全、合意的身体接触能给你直接的温暖。",
     give: "你自然地用拥抱、牵手等方式传递亲近感。",
   },
@@ -101,21 +101,21 @@ const REPORT: Record<
   { need: string; strength: string; watch: string; action: string }
 > = {
   words: {
-    need: "你需要爱被明确地说出来。具体的肯定、感谢和鼓励，比笼统的赞美更容易真正抵达你。",
+    need: "你在意的，不只是对方心里有没有你，还在意那些心意有没有被说出来。一句具体的欣赏、真诚的感谢或“我知道你很努力”，都可能让你安心很久。你需要的不是漂亮话，而是知道：你真的被看见了。",
     strength: "你能敏锐地看见他人的努力，并用语言赋予对方信心与被理解的感觉。",
     watch: "沉默、敷衍回应或带刺的评价，可能比对方预想得更容易让你受伤。",
     action:
       "试着直接告诉重要的人：‘当你具体说出欣赏我的地方时，我会很有力量。’",
   },
   time: {
-    need: "你重视的是专注，而不只是相处时长。没有屏幕和事务打断的共同时间，会让你感到被优先选择。",
+    need: "你在意的从来不是陪了多久，而是对方有没有真的来到你身边。哪怕只有二十分钟，只要对方认真听你讲话，你就会觉得：原来我在你心里是有位置的。",
     strength: "你愿意倾听、投入，并通过共同经历让关系逐渐拥有深度。",
     watch:
       "人在身边却心不在焉，可能会被你体验为疏远；但对方未必意识到这种落差。",
     action: "提前约定一段短而完整的专属时间，并一起决定这段时间怎样度过。",
   },
   gifts: {
-    need: "你在意礼物背后的记得、观察与心意，而不是价格。一件贴合你的物品，会成为关系的有形记忆。",
+    need: "你喜欢的未必是礼物本身，而是那句藏在礼物后面的：“我想到你了。”一张票根、一块喜欢的点心或一件随口提过的小东西，都可能让你心动。",
     strength: "你善于留意细节，并把抽象的惦念转化成可以被保存、被回想的象征。",
     watch:
       "错过纪念日或过于随意的礼物可能令你失落，也要避免把花费等同于爱的多少。",
@@ -123,7 +123,7 @@ const REPORT: Record<
       "可以分享自己的收藏与偏好，也说明：有意义的小物或手写卡片就足以让你开心。",
   },
   acts: {
-    need: "可靠的行动最能带给你安全感。主动分担、兑现承诺和解决具体问题，会让你确认自己不是独自承担。",
+    need: "对你来说，爱不能只停在嘴边。当你忙不过来时，有人主动接手一件事情；当你被琐事困住时，有人愿意一起处理。这会让你觉得：生活不是只有你一个人在扛。",
     strength: "你务实、可靠，常能在别人真正需要时提供有用而具体的支持。",
     watch:
       "只说不做或反复失约容易消耗你的信任；同时也别默默包办到自己筋疲力尽。",
@@ -131,11 +131,277 @@ const REPORT: Record<
       "把需要说得具体可执行，例如：‘这周如果你能负责晚饭，我会感到被支持。’",
   },
   touch: {
-    need: "在双方同意、舒适与安全的前提下，合适的身体接触能让亲近感直接而真实地发生。",
+    need: "在双方都愿意的前提下，你很容易从身体的靠近里感受到关系的温度。一只牵过来的手、一个安静的拥抱，或者有人让你靠一会儿，有些爱不用解释就能被感受到。",
     strength: "你能用温柔的非语言方式传递安慰、欢迎与陪伴。",
     watch: "身体边界会随关系、情境和状态改变；亲密不等于默认许可。",
     action:
       "用一句简单的询问建立安全感，例如：‘你现在想要一个拥抱吗？’并尊重任何答案。",
+  },
+};
+
+const PERSONAL_RESULT: Record<string, { title: string; body: string }> = {
+  "words-words": {
+    title: "你相信，爱应该被说出来。",
+    body: "你希望听见明确的喜欢、感谢和欣赏，也习惯把自己的心意直接告诉对方。你很容易用自己最需要的方式去爱别人。但也要记得，有些人不擅长把爱说出口，却可能一直在用其他方式靠近你。",
+  },
+  "words-time": {
+    title: "你想听见爱，却习惯用时间回答。",
+    body: "你希望对方清楚告诉你：喜欢你、欣赏你、把你放在心上。可当你爱一个人时，你更常留出时间认真陪伴。你用“我在这里”表达爱，却希望对方用“我爱你”回应。",
+  },
+  "words-gifts": {
+    title: "你把爱藏进礼物里，却想听它被说出来。",
+    body: "你很在意明确的赞美、感谢和情感确认；表达爱时却更习惯记住对方的喜好，带回一点小心意。你送出的是“我想到你了”，想收到的是“你对我很重要”。",
+  },
+  "words-acts": {
+    title: "你做了很多，却也想被认真夸一句。",
+    body: "你习惯把爱变成行动：处理琐事、承担责任、照顾生活。但你真正期待的，是有人看见这些并给出明确肯定。你不是天生就该做这些，而是因为在乎才愿意付出。",
+  },
+  "words-touch": {
+    title: "你用拥抱靠近，却想听见一句确定。",
+    body: "你习惯通过牵手、拥抱和自然靠近表达亲近，真正让你安心的却是对方明确说出喜欢和在乎。你给出去的是亲近，想收到的是确认。",
+  },
+  "time-words": {
+    title: "你会把爱说出来，却更想有人留下来。",
+    body: "你习惯表达感谢、欣赏和喜欢，但最珍贵的回应是对方愿意停下来认真陪你。你可能很会说“我在乎你”，却不一定会直接说“我想让你陪陪我”。",
+  },
+  "time-time": {
+    title: "你相信，真正的在乎是认真在场。",
+    body: "你希望有人专心听你说话，也习惯把时间和注意力留给喜欢的人。关系里的连接感，来自完整的聊天、认真投入的约会和共同经历。",
+  },
+  "time-gifts": {
+    title: "你会记得对方喜欢什么，却更想被认真陪伴。",
+    body: "你习惯通过小礼物表达惦记，但真正想收到的不是另一份礼物，而是一段不被打断的时间。你想知道的是：你愿不愿意真正陪我待一会儿。",
+  },
+  "time-acts": {
+    title: "你忙着照顾别人，却想有人停下来陪你。",
+    body: "你会习惯性地帮忙处理事情，把麻烦挡在前面。但你最想收到的，可能只是有人停下来认真听你说话。你给出去的是支持，想收到的是在场。",
+  },
+  "time-touch": {
+    title: "你用靠近表达爱，却希望被认真听见。",
+    body: "你习惯通过拥抱、牵手和依偎表达亲近，但真正让你觉得被爱的是对方愿意认真听你讲心里的话。你需要的不是一直待在一起，而是那段时间里对方真的在。",
+  },
+  "gifts-words": {
+    title: "你把爱说得很清楚，也想知道自己有没有被记住。",
+    body: "你习惯直接表达喜欢、欣赏和感谢，却最容易被对方在你不在场时仍记得你的喜好而打动。你在意的不是花了多少钱，而是生活里有没有想到你。",
+  },
+  "gifts-time": {
+    title: "你愿意把时间留给对方，也想被藏进对方的日常。",
+    body: "你习惯认真陪伴，愿意一起创造共同经历；期待的回应却是那些可以留下来的小小心意。你给出的是相处时的投入，想收到的是分开时仍存在的惦记。",
+  },
+  "gifts-gifts": {
+    title: "你相信，心意可以被看见，也可以被留下。",
+    body: "你会记住对方喜欢的东西，也容易被小惊喜打动。礼物不是价格标签，而是一种具体的记得；真正重要的是心意，不必让礼物变成负担或考核。",
+  },
+  "gifts-acts": {
+    title: "你会替别人解决麻烦，也想被认真惦记。",
+    body: "你习惯用行动照顾关系，但真正容易让你心动的是对方记得你说过的一件小事。你给出的是“我来帮你”，想收到的是“我想到你了”。",
+  },
+  "gifts-touch": {
+    title: "你习惯用靠近表达爱，也希望爱能留下痕迹。",
+    body: "你自然地用拥抱、牵手和依偎表达亲近，也容易被具体的小心意打动。你给出的是当下的亲近，想收到的是可以被记住的惦记。",
+  },
+  "acts-words": {
+    title: "你会安慰别人，却也希望有人真的帮你一把。",
+    body: "你习惯通过鼓励和欣赏让别人感受到爱，但自己需要支持时，更希望有人直接接过一件事情。你真正想听到的也许是：“这件事交给我，你先休息。”",
+  },
+  "acts-time": {
+    title: "你愿意听别人说话，也希望有人和你一起承担。",
+    body: "你习惯认真陪伴，但自己被现实问题困住时，更需要有人帮你分担。你给出去的是“我陪你”，想收到的是“我来帮你”。",
+  },
+  "acts-gifts": {
+    title: "你会把爱放进礼物里，却希望有人把爱落到行动上。",
+    body: "你容易记住对方的喜好，也愿意用小惊喜表达惦记；但需要被照顾时，你更在意现实负担能否真的减轻。让你安心的不只是被想起，还有被接住。",
+  },
+  "acts-acts": {
+    title: "你相信，爱要落在真实生活里。",
+    body: "你会主动帮忙，也希望对方主动分担。共同处理问题会让关系显得可靠有力量。但别让所有爱都变成任务清单，偶尔说一句“谢谢你”也很重要。",
+  },
+  "acts-touch": {
+    title: "你用拥抱安慰别人，却希望有人帮你减轻负担。",
+    body: "对方难过时，你可能先靠近和拥抱；轮到自己疲惫时，却更希望有人主动替你处理一件事情。你给出去的是安慰，想收到的是支持。",
+  },
+  "touch-words": {
+    title: "你会把喜欢说出来，也希望被温柔地靠近。",
+    body: "你习惯直接表达爱意、欣赏和感谢，但真正让你安心的可能是一只牵过来的手或一个拥抱。在双方都愿意时，亲近会让关系的温度更清楚。",
+  },
+  "touch-time": {
+    title: "你愿意认真陪伴，也希望有人向你靠近。",
+    body: "你习惯把时间留给喜欢的人，期待的回应却也包括一个拥抱、一次牵手或安静依偎。你给出的是“我在这里”，想收到的是“我愿意靠近你”。",
+  },
+  "touch-gifts": {
+    title: "你把惦记放进礼物里，却更想被抱一抱。",
+    body: "你习惯通过小惊喜和纪念品表达爱，但轮到自己，真正让你觉得被爱的可能只是对方走过来，自然地抱住你。",
+  },
+  "touch-acts": {
+    title: "你替别人撑住生活，也想有人抱住你。",
+    body: "你习惯处理问题、承担责任，把事情安排妥当；但你真正想收到的不一定是同样多的事情，而是忙完以后有人走过来抱抱你。你给出的是可靠，想收到的是温柔。",
+  },
+  "touch-touch": {
+    title: "你相信，有些爱不用解释，靠近就能感受到。",
+    body: "你习惯通过牵手、拥抱和依偎表达爱，也容易从这些亲近里获得安心。即使双方都喜欢亲近，也要尊重不同时间和情绪下的边界。",
+  },
+};
+
+const RELATION_RESULT: Record<
+  string,
+  { title: string; advice: string; say?: string }
+> = {
+  "words-words": {
+    title: "你们都愿意把爱说出来。",
+    advice: "多说一句具体的“我欣赏你什么”，会比笼统的“你很好”更有力量。",
+  },
+  "words-time": {
+    title: "对方用陪伴回答，你却想听见答案。",
+    advice: "请对方在陪伴时，也把心里的喜欢说出来。",
+    say: "你愿意陪我，我很开心。如果你能直接告诉我你在想什么，我会更安心。",
+  },
+  "words-gifts": {
+    title: "对方给了你礼物，你想听见礼物后面的那句话。",
+    advice: "让对方说明这份礼物背后的想法。",
+    say: "我很喜欢你给我的东西，也想听听你为什么会想到我。",
+  },
+  "words-acts": {
+    title: "对方做了很多，你还是想被认真夸一句。",
+    advice: "在行动之外，增加具体的感谢和欣赏。",
+    say: "你帮我做这些，我都知道。如果你也能告诉我，你欣赏我哪里，我会觉得更被爱。",
+  },
+  "words-touch": {
+    title: "对方靠近你，你想知道这份靠近意味着什么。",
+    advice: "在亲近时，说一句明确的感受。",
+    say: "你抱着我的时候，如果也告诉我你在想什么，我会更安心。",
+  },
+  "time-words": {
+    title: "对方说了很多喜欢，你更希望对方留下来。",
+    advice: "把表达爱意变成明确的相处安排。",
+    say: "你说这些我很开心，但我也想和你认真待一会儿。",
+  },
+  "time-time": {
+    title: "你们都知道，认真在场有多重要。",
+    advice: "待在一起不等于真正陪伴，把手机放下，把注意力留给眼前的人。",
+  },
+  "time-gifts": {
+    title: "对方想让你开心，你更想和对方一起度过时间。",
+    advice: "把礼物和共同相处结合起来。",
+    say: "谢谢你记得我喜欢这个。我们一起出去走走吧，我想和你多待一会儿。",
+  },
+  "time-acts": {
+    title: "对方替你解决问题，你想先被认真听见。",
+    advice: "解决问题之前，先确认你更需要陪伴还是帮助。",
+    say: "我知道你想帮我，但现在你先听我说一会儿，好吗？",
+  },
+  "time-touch": {
+    title: "对方抱住你，你还想把话说完。",
+    advice: "亲近之后，继续给彼此一点认真交流的时间。",
+    say: "你抱我，我会觉得安心。然后你能不能再听我说一会儿？",
+  },
+  "gifts-words": {
+    title: "对方说了喜欢，你想知道自己有没有被记在心里。",
+    advice: "把说出口的心意留下一点痕迹。",
+    say: "你说喜欢我，我很开心。偶尔给我留一点小纪念，我也会觉得特别被惦记。",
+  },
+  "gifts-time": {
+    title: "对方愿意陪你，你也想知道分开时有没有被想起。",
+    advice: "为共同经历留下一张照片、一张卡片或一个小纪念。",
+  },
+  "gifts-gifts": {
+    title: "你们都懂得，把惦记变成具体的小心意。",
+    advice: "保留仪式感，但不要让礼物变成压力。",
+  },
+  "gifts-acts": {
+    title: "对方照顾你的生活，你还想被悄悄惦记一次。",
+    advice: "在日常照顾中增加一点属于你的专属心意。",
+    say: "你平时帮我很多，我都知道。偶尔带回一点你觉得我会喜欢的小东西，我也会特别开心。",
+  },
+  "gifts-touch": {
+    title: "对方用靠近表达爱，你也想让这份爱留下来。",
+    advice: "把当下的亲近，偶尔变成可以保存的小纪念。",
+    say: "我很喜欢你抱我，也想留下一点属于我们的回忆。",
+  },
+  "acts-words": {
+    title: "对方说你辛苦了，你更希望有人接手一件事。",
+    advice: "鼓励之后，明确接手一项具体任务。",
+    say: "谢谢你理解我。现在如果你能帮我把这件事处理掉，我会更轻松。",
+  },
+  "acts-time": {
+    title: "对方想陪你，你想让对方和你一起承担。",
+    advice: "先明确最需要分担的事情，再一起休息和交流。",
+    say: "你愿意陪我，我很感激。我们能不能先一起把这件事处理掉？",
+  },
+  "acts-gifts": {
+    title: "对方想送你惊喜，你更需要一点实际支持。",
+    advice: "把心意落实到对方最需要支持的地方。",
+    say: "礼物我很喜欢，但我现在最需要的是你帮我把这件事接过去。",
+  },
+  "acts-acts": {
+    title: "你们都相信，爱要一起扛起生活。",
+    advice: "定期调整分工，也记得感谢彼此，不要让关系只剩任务。",
+  },
+  "acts-touch": {
+    title: "对方想抱你，你更希望有人帮你处理眼前的事。",
+    advice: "先问你最需要什么，再决定是拥抱还是帮忙。",
+    say: "我知道你想安慰我。我们先把这件事处理完，之后再抱一会儿，好吗？",
+  },
+  "touch-words": {
+    title: "对方说爱你，你也想被轻轻抱住。",
+    advice: "在双方都愿意的前提下，把语言和拥抱结合起来。",
+    say: "你说这些我很开心。你可以再抱抱我吗？",
+  },
+  "touch-time": {
+    title: "对方愿意陪你，你还希望再靠近一点。",
+    advice: "直接说出自己喜欢怎样的身体靠近。",
+    say: "我们聊天的时候，你可以牵着我的手吗？",
+  },
+  "touch-gifts": {
+    title: "对方准备了礼物，你更期待见面时的拥抱。",
+    advice: "送出礼物时，也问问对方是否想要一个拥抱。",
+    say: "我很喜欢你准备的东西，但其实我更想先抱抱你。",
+  },
+  "touch-acts": {
+    title: "对方把事情都安排好了，你只是想被抱一会儿。",
+    advice: "忙完之后，留一个双方都舒服的亲近时刻。",
+    say: "谢谢你帮我处理这些。现在你能不能抱我一下？",
+  },
+  "touch-touch": {
+    title: "你们都能从靠近里感受到爱。",
+    advice: "亲近之前确认意愿，比默认对方应该接受更重要。",
+  },
+};
+
+const CONFLICT_GUIDE: Record<
+  LoveKey,
+  { need: string; response: string; avoid: string; request: string }
+> = {
+  words: {
+    need: "争执之后，你最想确认的是：我们有分歧，但你是不是仍然在乎我？",
+    response: "我们现在确实有分歧，但我没有否定你，也没有想放弃这段关系。",
+    avoid: "“你别想太多”或“这有什么好说的”。",
+    request:
+      "我知道你已经做了很多，但如果你能告诉我，你欣赏我什么，我会更安心。",
+  },
+  time: {
+    need: "争执之后，你最难受的往往是对方直接回避或沉默。",
+    response: "我们都先冷静一下，今晚找半小时，把这件事认真说清楚。",
+    avoid: "不说明原因地消失、冷处理，或一边刷手机一边敷衍。",
+    request: "我现在不是想让你解决问题，我只是希望你先认真听我说一会儿。",
+  },
+  gifts: {
+    need: "争执之后，你会在意对方有没有认真表达修复关系的心意。",
+    response: "我写下了我想和你说的话，也想认真聊聊接下来怎么改。",
+    avoid: "只送礼物，却拒绝承认问题或讨论矛盾。",
+    request: "我不是一定要贵重礼物，只是偶尔想知道，你在生活里有没有想到过我。",
+  },
+  acts: {
+    need: "争执之后，你更想知道：同样的问题，以后准备怎样避免？",
+    response:
+      "我知道这件事一直由你承担。以后这部分由我负责，我们过几天再看看是否合适。",
+    avoid: "一直道歉，却没有任何具体调整。",
+    request: "我知道你关心我，但现在最能让我轻松的，是你帮我接手这件事。",
+  },
+  touch: {
+    need: "争执之后，你可能希望通过拥抱重新连接，但是否愿意被碰仍需确认。",
+    response: "我知道你还在生气。你现在想让我抱抱你，还是想先把话说清楚？",
+    avoid: "对方明确拒绝后，仍然坚持靠近或触碰。",
+    request: "如果你也愿意的话，我现在想要一个拥抱。",
   },
 };
 
@@ -144,7 +410,7 @@ type Question = {
   scene: string;
   options: [{ key: LoveKey; text: string }, { key: LoveKey; text: string }];
 };
-const questions: Question[] = [
+export const legacyQuestions: Question[] = [
   {
     mode: "receive",
     scene: "你为一件事熬了很久，终于走到终点，哪种回应更触动你？",
@@ -427,6 +693,265 @@ const questions: Question[] = [
   },
 ];
 
+const makeQuestion = (
+  mode: Question["mode"],
+  scene: string,
+  first: LoveKey,
+  firstText: string,
+  second: LoveKey,
+  secondText: string,
+): Question => ({
+  mode,
+  scene,
+  options: [
+    { key: first, text: firstText },
+    { key: second, text: secondText },
+  ],
+});
+
+const questions: Question[] = [
+  makeQuestion(
+    "receive",
+    "一个平常的晚上，哪件事更容易让你觉得自己被认真放在心上？",
+    "words",
+    "对方告诉你，最近很欣赏你做的一件事。",
+    "time",
+    "对方放下手机，专心听你讲今天发生的事情。",
+  ),
+  makeQuestion(
+    "receive",
+    "哪件小事更容易让你觉得：“原来你一直记得我”？",
+    "gifts",
+    "对方路过一家店，带回你之前随口提过喜欢的小东西。",
+    "acts",
+    "对方记得你最近被一件小事困扰，顺手替你处理好了。",
+  ),
+  makeQuestion(
+    "receive",
+    "分开一段时间后再次见面，你更期待：",
+    "touch",
+    "对方走过来，给你一个久违的拥抱。",
+    "words",
+    "对方认真告诉你，这段时间有多想你。",
+  ),
+  makeQuestion(
+    "receive",
+    "最近生活有些忙乱，但没有特别紧急的事情。你更希望对方：",
+    "time",
+    "空出一个晚上，陪你聊聊最近的感受。",
+    "acts",
+    "主动帮你处理一件一直拖着没完成的小事。",
+  ),
+  makeQuestion(
+    "receive",
+    "一次愉快的约会结束后，什么更容易让你记住这一天？",
+    "gifts",
+    "对方留下了一件和这次约会有关的小纪念。",
+    "touch",
+    "道别时，对方牵住你的手，或者轻轻抱了你一下。",
+  ),
+  makeQuestion(
+    "receive",
+    "如果对方想让一个普通的周末变得特别，你更喜欢：",
+    "time",
+    "安排一段只有你们两个人的相处时间。",
+    "gifts",
+    "准备一件看得出来很了解你的小礼物。",
+  ),
+  makeQuestion(
+    "receive",
+    "哪种表达更容易让你觉得：“对方是真的懂我”？",
+    "acts",
+    "对方注意到你最近被一件琐事困扰，主动帮你解决。",
+    "words",
+    "对方说出自己具体欣赏你什么，而不是笼统地夸你。",
+  ),
+  makeQuestion(
+    "receive",
+    "当你希望重新找回亲近感时，你更喜欢：",
+    "touch",
+    "靠在一起，牵牵手，或者安静地抱一会儿。",
+    "time",
+    "坐下来认真聊聊彼此最近在想什么。",
+  ),
+  makeQuestion(
+    "receive",
+    "一个不算忙碌的周末，你更容易被哪件事打动？",
+    "acts",
+    "对方主动帮你完成一件原本需要你处理的小事。",
+    "touch",
+    "对方坐到你身边，让你靠着休息一会儿。",
+  ),
+  makeQuestion(
+    "receive",
+    "如果对方想表达感谢，哪种方式更让你心动？",
+    "words",
+    "清楚说出：“我知道你做了什么，也真的很感谢你。”",
+    "gifts",
+    "准备一张卡片，或者一件有纪念意义的小东西。",
+  ),
+  makeQuestion(
+    "receive",
+    "当你分享一件自己很在意的事情时，你更希望：",
+    "time",
+    "对方认真听你讲完整个过程，并继续追问细节。",
+    "words",
+    "对方明确告诉你：“你做得很好，我真的很为你高兴。”",
+  ),
+  makeQuestion(
+    "receive",
+    "下面哪种日常小事更容易让你心里一暖？",
+    "acts",
+    "对方看出你最近有点忙，主动替你完成一件小事。",
+    "gifts",
+    "对方回家时带来你喜欢的小零食，说路过时想起了你。",
+  ),
+  makeQuestion(
+    "receive",
+    "在一个值得纪念的日子，你更在意：",
+    "gifts",
+    "有没有一份可以留下来的、体现心意的小纪念。",
+    "time",
+    "有没有一段只属于彼此、认真投入的相处时间。",
+  ),
+  makeQuestion(
+    "receive",
+    "结束忙碌的一天回到家，你更希望：",
+    "touch",
+    "对方走过来，给你一个安静的拥抱。",
+    "acts",
+    "对方已经顺手替你处理了一件让你惦记的事情。",
+  ),
+  makeQuestion(
+    "receive",
+    "当你想确认一段关系的温度时，哪种方式更容易让你安心？",
+    "words",
+    "对方清楚表达喜欢、想念和在乎。",
+    "touch",
+    "对方自然地牵起你的手，或者靠近你。",
+  ),
+  makeQuestion(
+    "give",
+    "最近想让对方知道自己很重要时，你更常做的是：",
+    "time",
+    "空出时间，认真陪对方说说话或一起做点什么。",
+    "words",
+    "直接告诉对方，你欣赏什么、感谢什么。",
+  ),
+  makeQuestion(
+    "give",
+    "最近想到对方时，你更容易：",
+    "acts",
+    "留意有没有什么事情可以主动替对方处理。",
+    "gifts",
+    "留意有没有适合对方的小东西，想找机会带回去。",
+  ),
+  makeQuestion(
+    "give",
+    "最近一次表达想念时，你更接近：",
+    "words",
+    "直接告诉对方：“我很想你。”",
+    "touch",
+    "见面时主动抱住对方，或者牵住对方的手。",
+  ),
+  makeQuestion(
+    "give",
+    "对方最近有点忙时，你更常做的是：",
+    "acts",
+    "主动接手一件具体的事情，让对方轻松一点。",
+    "time",
+    "留出时间，陪对方聊聊最近的状态。",
+  ),
+  makeQuestion(
+    "give",
+    "一次开心的约会结束后，你更自然会：",
+    "touch",
+    "牵手、拥抱，或者靠近对方一会儿。",
+    "gifts",
+    "留下一张照片、一个纪念品或一件小心意。",
+  ),
+  makeQuestion(
+    "give",
+    "想让普通的一天变得特别时，你更可能：",
+    "gifts",
+    "准备一件对方喜欢的小东西。",
+    "time",
+    "专门安排一段两个人好好相处的时间。",
+  ),
+  makeQuestion(
+    "give",
+    "看到对方最近很努力，你更常做的是：",
+    "words",
+    "直接表达欣赏、感谢或鼓励。",
+    "acts",
+    "主动分担一件事情，让对方休息一下。",
+  ),
+  makeQuestion(
+    "give",
+    "和喜欢的人待在一起时，你更自然会：",
+    "time",
+    "认真聊天，想知道对方最近在想什么。",
+    "touch",
+    "靠近对方，牵手、拥抱或依偎。",
+  ),
+  makeQuestion(
+    "give",
+    "对方情绪不太好时，你更本能的第一反应是：",
+    "touch",
+    "给对方一个拥抱，或者安静地靠近对方。",
+    "acts",
+    "看看有没有具体的事情能替对方处理。",
+  ),
+  makeQuestion(
+    "give",
+    "想表达“我一直记得你”时，你更常做的是：",
+    "gifts",
+    "带回一件对方喜欢的小东西，或者留下小纪念。",
+    "words",
+    "直接告诉对方，你为什么会想到对方。",
+  ),
+  makeQuestion(
+    "give",
+    "最近想表达爱意时，你更接近：",
+    "words",
+    "清楚说出喜欢、欣赏或感谢。",
+    "time",
+    "腾出时间，专心和对方待在一起。",
+  ),
+  makeQuestion(
+    "give",
+    "平时想照顾对方时，你更容易：",
+    "gifts",
+    "准备一点对方会喜欢的小心意。",
+    "acts",
+    "主动处理一件对方最近觉得麻烦的事情。",
+  ),
+  makeQuestion(
+    "give",
+    "想为两个人创造一段好回忆时，你更倾向：",
+    "time",
+    "一起安排一次完整、投入的共同体验。",
+    "gifts",
+    "准备一件和你们共同回忆有关的小纪念。",
+  ),
+  makeQuestion(
+    "give",
+    "对方表现出疲惫时，你更常做的是：",
+    "acts",
+    "主动接手一件眼前需要处理的事情。",
+    "touch",
+    "抱抱对方，或者陪对方安静靠一会儿。",
+  ),
+  makeQuestion(
+    "give",
+    "想表达关系里的亲近感时，你更自然会：",
+    "touch",
+    "牵手、拥抱或依偎。",
+    "words",
+    "直接说出爱意、想念或欣赏。",
+  ),
+];
+
 const tieCopy: Record<"receive" | "give", Record<LoveKey, string>> = {
   receive: {
     words: "听到对方真诚说出欣赏、感谢与鼓励",
@@ -456,7 +981,7 @@ function calc(answers: Array<LoveKey | null>, mode: "receive" | "give") {
     .map((key) => ({
       key,
       score: totals[key],
-      pct: Math.round((totals[key] / 4) * 100),
+      pct: Math.round((totals[key] / 6) * 100),
     }))
     .sort((a, b) => b.score - a.score);
 }
@@ -478,7 +1003,7 @@ function decodeProfile(value: string | null): MatchProfile | null {
     return parsed.receive.length === 5 &&
       parsed.give.length === 5 &&
       [...parsed.receive, ...parsed.give].every(
-        (score) => Number.isInteger(score) && score >= 0 && score <= 4,
+        (score) => Number.isInteger(score) && score >= 0 && score <= 6,
       )
       ? parsed
       : null;
@@ -496,39 +1021,30 @@ function MatchReport({
   mine: MatchProfile;
   onCreatePoster: () => void;
 }) {
-  const fit = (need: number[], expression: number[]) =>
-    Math.round(
-      100 -
-        (need.reduce(
-          (sum, score, i) => sum + Math.abs(score - expression[i]),
-          0,
-        ) /
-          20) *
-          100,
+  const fit = (need: number[], expression: number[]) => {
+    const needTotal = need.reduce((sum, score) => sum + score, 0) || 1;
+    const expressionTotal =
+      expression.reduce((sum, score) => sum + score, 0) || 1;
+    const distance = need.reduce(
+      (sum, score, i) =>
+        sum + Math.abs(score / needTotal - expression[i] / expressionTotal),
+      0,
     );
+    return Math.round((1 - distance / 2) * 100);
+  };
   const receiveFit = fit(mine.receive, inviter.give);
   const giveFit = fit(inviter.receive, mine.give);
   const overall = Math.round((receiveFit + giveFit) / 2);
-  const warmKey = LOVE_KEYS.slice().sort(
-    (a, b) =>
-      Math.min(
-        mine.receive[LOVE_KEYS.indexOf(b)],
-        inviter.give[LOVE_KEYS.indexOf(b)],
-      ) -
-      Math.min(
-        mine.receive[LOVE_KEYS.indexOf(a)],
-        inviter.give[LOVE_KEYS.indexOf(a)],
-      ),
-  )[0];
-  const gapKey = LOVE_KEYS.slice().sort(
-    (a, b) =>
-      Math.abs(
-        mine.receive[LOVE_KEYS.indexOf(b)] - inviter.give[LOVE_KEYS.indexOf(b)],
-      ) -
-      Math.abs(
-        mine.receive[LOVE_KEYS.indexOf(a)] - inviter.give[LOVE_KEYS.indexOf(a)],
-      ),
-  )[0];
+  const mainKey = (scores: number[]) =>
+    LOVE_KEYS.slice().sort(
+      (a, b) => scores[LOVE_KEYS.indexOf(b)] - scores[LOVE_KEYS.indexOf(a)],
+    )[0];
+  const mineNeed = mainKey(mine.receive);
+  const theirGive = mainKey(inviter.give);
+  const theirNeed = mainKey(inviter.receive);
+  const mineGive = mainKey(mine.give);
+  const towardMe = RELATION_RESULT[`${mineNeed}-${theirGive}`];
+  const towardThem = RELATION_RESULT[`${theirNeed}-${mineGive}`];
   const level =
     overall >= 80
       ? "很会接住彼此"
@@ -562,18 +1078,22 @@ function MatchReport({
       </div>
       <div className="match-guide">
         <article>
-          <small>你们容易彼此接住的地方</small>
-          <h3>{LOVE[warmKey].name}</h3>
+          <small>你期待什么 · 对方怎样给</small>
+          <h3>{towardMe.title}</h3>
           <p>
-            {LOVE[warmKey].desc}这是你们可以有意识保留、继续创造的共同语言。
+            你更期待通过“{LOVE[mineNeed].name}”感受爱，对方则习惯用“
+            {LOVE[theirGive].name}”表达。{towardMe.advice}
           </p>
+          {towardMe.say && <blockquote>“{towardMe.say}”</blockquote>}
         </article>
         <article>
-          <small>最值得主动翻译的地方</small>
-          <h3>{LOVE[gapKey].name}</h3>
+          <small>对方期待什么 · 你怎样给</small>
+          <h3>{towardThem.title}</h3>
           <p>
-            这一项的需要与自然表达存在较大差异。差异不代表不爱，只是需要更明确地说出“怎样做，我会更容易感受到”。
+            对方更期待通过“{LOVE[theirNeed].name}”感受爱，你则习惯用“
+            {LOVE[mineGive].name}”表达。{towardThem.advice}
           </p>
+          {towardThem.say && <blockquote>“{towardThem.say}”</blockquote>}
         </article>
       </div>
       <div className="match-practice">
@@ -728,16 +1248,18 @@ function DetailedReport({
 }) {
   const receiveMain = receive[0].key;
   const giveMain = give[0].key;
+  const personal = PERSONAL_RESULT[`${receiveMain}-${giveMain}`];
   const receiveLeaders = receive.filter(
     (item) => item.score === receive[0].score,
   );
   const giveLeaders = give.filter((item) => item.score === give[0].score);
   const receiveSecond =
-    receive[0].score > receive[1].score && receive[1].score > receive[2].score
+    receive[0].score - receive[1].score === 1 &&
+    receive[1].score > receive[2].score
       ? receive[1]
       : null;
   const giveSecond =
-    give[0].score > give[1].score && give[1].score > give[2].score
+    give[0].score - give[1].score === 1 && give[1].score > give[2].score
       ? give[1]
       : null;
   return (
@@ -747,6 +1269,13 @@ function DetailedReport({
         <h2>你的双向爱语报告</h2>
         <p>分数代表当下的相对偏好，不是能力高低，也不是固定不变的人格标签。</p>
       </div>
+      {!receiveLeaders.slice(1).length && !giveLeaders.slice(1).length && (
+        <div className="personal-summary">
+          <small>你的个人测评结论</small>
+          <h3>{personal.title}</h3>
+          <p>{personal.body}</p>
+        </div>
+      )}
       <div className="report-grid">
         <article>
           <small>01 · 内在需要</small>
@@ -809,6 +1338,18 @@ function DetailedReport({
           <li>我做过什么，让你感到被理解或被支持？</li>
           <li>这周我们可以各做一件什么具体的小事？</li>
         </ol>
+        <div className="conflict-guide">
+          <small>发生矛盾以后</small>
+          <h3>{CONFLICT_GUIDE[receiveMain].need}</h3>
+          <p>
+            <b>更适合的回应：</b>“{CONFLICT_GUIDE[receiveMain].response}”
+          </p>
+          <p>
+            <b>尽量避免：</b>
+            {CONFLICT_GUIDE[receiveMain].avoid}
+          </p>
+          <blockquote>“{CONFLICT_GUIDE[receiveMain].request}”</blockquote>
+        </div>
       </div>
     </section>
   );
@@ -1349,7 +1890,9 @@ export default function Home() {
               又习惯怎样去爱？
             </h1>
             <p className="lead">
-              爱并不只有一种表达方式。这份双向测试，帮你分别看见自己的接收偏好与付出习惯。
+              有些人需要一句明确的“我爱你”，有些人需要对方坐下来认真听自己说话；有人会为一份被惦记的小礼物心动，也有人在实际照顾或一个拥抱里感到安心。
+              <br />
+              我们最想收到的爱，不一定是我们最习惯给出去的爱。
             </p>
             {inviterProfile && (
               <div className="invite-arrived">
@@ -1359,13 +1902,16 @@ export default function Home() {
                 </span>
               </div>
             )}
+            <div className="answer-guide">
+              每题选择更接近真实感受的一项；如果都符合，选择更能打动你或你更常做的那个。答案没有对错，身体接触默认双方都愿意且舒适。
+            </div>
             <button className="primary" onClick={startQuiz}>
               开始探索 <span>→</span>
             </button>
             <div className="meta">
-              <span>20 道情境二选一</span>
+              <span>30 道情境二选一</span>
               <i />
-              <span>约 3 分钟</span>
+              <span>约 5 分钟</span>
               <i />
               <span>匿名统计，不保存逐题答案</span>
             </div>
@@ -1424,8 +1970,8 @@ export default function Home() {
           </button>
           <div className="step-text">
             {q.mode === "receive"
-              ? "第一部分 · 哪种方式更让我感到被爱"
-              : "第二部分 · 我更自然地怎样表达爱"}
+              ? "第一部分 · 你期待怎样被爱"
+              : "第二部分 · 你习惯怎样去爱"}
           </div>
           <div className="count">
             {String(index + 1).padStart(2, "0")} / {questions.length}
@@ -1458,7 +2004,11 @@ export default function Home() {
               </button>
             ))}
           </div>
-          <p className="choice-note">不比较客观价值，只凭第一感觉选择</p>
+          <p className="choice-note">
+            {q.mode === "receive"
+              ? "选择在真实生活里更容易打动你的那一个"
+              : "回想最近一个月，选择你更经常、也更自然会做的那一个"}
+          </p>
           <div className="quiz-actions">
             <button disabled={index === 0} onClick={() => setIndex(index - 1)}>
               ← 上一题
@@ -1533,16 +2083,13 @@ export default function Home() {
   );
   const giveLeaders = give.filter((item) => item.score === give[0].score);
   const hasTiedCore = receiveLeaders.length > 1 || giveLeaders.length > 1;
+  const personalResult = PERSONAL_RESULT[`${receive[0].key}-${give[0].key}`];
   const relationshipTitle = hasTiedCore
     ? "你的核心偏好不止一种。"
-    : receive[0].key === give[0].key
-      ? "你的爱，表达与接收有着自然的一致性。"
-      : "你给予爱的方式，未必是你最渴望收到的方式。";
+    : personalResult.title;
   const relationshipCopy = hasTiedCore
     ? `你在${receiveLeaders.length > 1 ? "接收爱" : "表达爱"}的方向上出现并列核心偏好。它们同样重要，不需要从中强行挑出一个代表你。`
-    : receive[0].key === give[0].key
-      ? `你很容易理解同样偏爱“${LOVE[receive[0].key].name}”的人。也别忘了询问对方真正需要什么，让熟悉的表达持续保有新鲜感。`
-      : `你偏爱通过“${LOVE[receive[0].key].name}”感受爱，却更常用“${LOVE[give[0].key].name}”表达爱。把这份差异说出来，也好奇对方的答案，爱就更容易抵达。`;
+    : personalResult.body;
   return (
     <main className="result-page">
       <header className="result-head">
