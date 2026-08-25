@@ -263,7 +263,9 @@ nav,
   align-items: center;
   gap: 8px;
   box-shadow: 0 8px 24px rgba(66, 42, 36, 0.08);
-  animation: love-orbit-counter-spin 48s linear infinite;
+  animation:
+    love-orbit-counter-spin 48s linear infinite,
+    love-orbit-breathe var(--drift-duration, 8s) ease-in-out infinite alternate;
 }
 @keyframes love-orbit-spin {
   to {
@@ -273,6 +275,14 @@ nav,
 @keyframes love-orbit-counter-spin {
   to {
     transform: rotate(-360deg);
+  }
+}
+@keyframes love-orbit-breathe {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: var(--drift-x, 0) var(--drift-y, 0);
   }
 }
 .orbit-tag b {
@@ -292,22 +302,42 @@ nav,
 .tag-0 {
   left: 12px;
   top: 88px;
+  --drift-x: -7px;
+  --drift-y: -5px;
+  --drift-duration: 8.4s;
+  animation-delay: 0s, -2.1s;
 }
 .tag-1 {
   right: -5px;
   top: 75px;
+  --drift-x: 7px;
+  --drift-y: -5px;
+  --drift-duration: 9.2s;
+  animation-delay: 0s, -6.4s;
 }
 .tag-2 {
   right: -20px;
   bottom: 120px;
+  --drift-x: 8px;
+  --drift-y: 3px;
+  --drift-duration: 7.8s;
+  animation-delay: 0s, -4.7s;
 }
 .tag-3 {
   left: 56px;
   bottom: 6px;
+  --drift-x: -3px;
+  --drift-y: 8px;
+  --drift-duration: 9.8s;
+  animation-delay: 0s, -1.3s;
 }
 .tag-4 {
   left: -38px;
   top: 245px;
+  --drift-x: -8px;
+  --drift-y: 1px;
+  --drift-duration: 8.8s;
+  animation-delay: 0s, -7.1s;
 }
 .promise {
   max-width: 1180px;
