@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 
 type LoveKey = "words" | "time" | "gifts" | "acts" | "touch";
-type Phase = "intro" | "quiz" | "result";
+type Phase = "intro" | "quiz" | "tiebreak" | "result";
 
 const LOVE: Record<LoveKey, { name: string; short: string; color: string; desc: string; receive: string; give: string }> = {
   words: { name: "肯定的言词", short: "言词", color: "#d96d62", desc: "真诚的赞美、感谢与鼓励，让爱被清楚地说出来。", receive: "你在意对方是否把欣赏与关心说出口。", give: "你习惯用鼓励、感谢和真诚表达支持别人。" },
@@ -35,25 +35,64 @@ const questions: { mode: "receive" | "give"; key: LoveKey; text: string }[] = [
 
 const scale = [{ n: 1, label: "完全不像我" }, { n: 2, label: "不太像我" }, { n: 3, label: "有点像我" }, { n: 4, label: "比较像我" }, { n: 5, label: "非常像我" }];
 
+const tieCopy: Record<"receive" | "give", Record<LoveKey, string>> = {
+  receive: {
+    words: "听到对方真诚说出欣赏、感谢与鼓励",
+    time: "拥有一段不被打扰、全心投入的相处时间",
+    gifts: "收到一份专门为我挑选、带着心意的小礼物",
+    acts: "对方主动替我分担一件现实中的麻烦事",
+    touch: "在彼此舒适和同意时，得到一个温暖的拥抱",
+  },
+  give: {
+    words: "把欣赏、感谢与鼓励清楚地说给对方听",
+    time: "放下其他事情，专心陪伴和倾听对方",
+    gifts: "为对方挑选或制作一份有个人意义的心意",
+    acts: "主动完成一件能真正减轻对方负担的事情",
+    touch: "在对方愿意时，用拥抱或牵手表达亲近",
+  },
+};
+
 function calc(answers: number[], mode: "receive" | "give") {
   const totals = Object.fromEntries(Object.keys(LOVE).map(k => [k, 0])) as Record<LoveKey, number>;
   questions.forEach((q, i) => { if (q.mode === mode) totals[q.key] += answers[i] || 0; });
   return (Object.keys(LOVE) as LoveKey[]).map(key => ({ key, score: totals[key], pct: Math.round((totals[key] / 15) * 100) })).sort((a, b) => b.score - a.score);
 }
 
-function ResultList({ title, eyebrow, data, mode }: { title: string; eyebrow: string; data: ReturnType<typeof calc>; mode: "receive" | "give" }) {
-  return <section className="result-card"><span className="result-eyebrow">{eyebrow}</span><h2>{title}</h2>
-    <div className="primary-love" style={{ "--accent": LOVE[data[0].key].color } as React.CSSProperties}><div className="rank-mark">01</div><div><strong>{LOVE[data[0].key].name}</strong><p>{LOVE[data[0].key][mode]}</p></div></div>
+type TieQuestion = { mode: "receive" | "give"; a: LoveKey; b: LoveKey };
+
+function makeTieQuestions(data: ReturnType<typeof calc>, mode: "receive" | "give"): TieQuestion[] {
+  const candidates = data.filter(item => data[0].score - item.score <= 2).map(item => item.key);
+  if (candidates.length < 2) return [];
+  if (candidates.length === 2) return [{ mode, a: candidates[0], b: candidates[1] }];
+  return candidates.slice(0, 5).map((key, i, list) => ({ mode, a: key, b: list[(i + 1) % list.length] }));
+}
+
+function rankWithTies(data: ReturnType<typeof calc>, choices: LoveKey[]) {
+  const votes = Object.fromEntries(Object.keys(LOVE).map(k => [k, 0])) as Record<LoveKey, number>;
+  choices.forEach(key => { votes[key] += 1; });
+  return data.map(item => ({ ...item, tieVotes: votes[item.key] })).sort((a, b) => {
+    if (Math.abs(a.score - b.score) > 2) return b.score - a.score;
+    return votes[b.key] - votes[a.key] || b.score - a.score;
+  });
+}
+
+function ResultList({ title, eyebrow, data, mode }: { title: string; eyebrow: string; data: ReturnType<typeof rankWithTies>; mode: "receive" | "give" }) {
+  const balanced = data[0].score - data[1].score <= 2 && data[0].tieVotes === data[1].tieVotes;
+  return <section className="result-card"><span className="result-eyebrow">{eyebrow}</span><h2>{balanced ? "多语言均衡型" : title}</h2>
+    <div className="primary-love" style={{ "--accent": LOVE[data[0].key].color } as React.CSSProperties}><div className="rank-mark">01</div><div><strong>{balanced ? `${LOVE[data[0].key].name} · ${LOVE[data[1].key].name}` : LOVE[data[0].key].name}</strong><p>{balanced ? "你的核心偏好非常接近，不必勉强自己只属于一种类型。" : LOVE[data[0].key][mode]}</p></div></div>
     <div className="bars">{data.map((item, i) => <div className="bar-row" key={item.key}><div className="bar-label"><span>{i + 1}. {LOVE[item.key].name}</span><b>{item.pct}%</b></div><div className="bar-track"><span style={{ width: `${item.pct}%`, background: LOVE[item.key].color }} /></div></div>)}</div>
   </section>;
 }
 
 export default function Home() {
-  const [phase, setPhase] = useState<Phase>("intro"); const [index, setIndex] = useState(0); const [answers, setAnswers] = useState<number[]>(Array(30).fill(0)); const [posterOpen, setPosterOpen] = useState(false); const canvasRef = useRef<HTMLCanvasElement>(null);
-  const receive = useMemo(() => calc(answers, "receive"), [answers]); const give = useMemo(() => calc(answers, "give"), [answers]);
-  useEffect(() => { if (phase === "quiz") window.scrollTo({ top: 0, behavior: "smooth" }); }, [index, phase]);
-  const choose = (n: number) => { const next = [...answers]; next[index] = n; setAnswers(next); window.setTimeout(() => index === 29 ? setPhase("result") : setIndex(index + 1), 180); };
-  const restart = () => { setAnswers(Array(30).fill(0)); setIndex(0); setPhase("quiz"); setPosterOpen(false); };
+  const [phase, setPhase] = useState<Phase>("intro"); const [index, setIndex] = useState(0); const [answers, setAnswers] = useState<number[]>(Array(30).fill(0)); const [tieIndex, setTieIndex] = useState(0); const [tieChoices, setTieChoices] = useState<{ receive: LoveKey[]; give: LoveKey[] }>({ receive: [], give: [] }); const [posterOpen, setPosterOpen] = useState(false); const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rawReceive = useMemo(() => calc(answers, "receive"), [answers]); const rawGive = useMemo(() => calc(answers, "give"), [answers]);
+  const tieQuestions = useMemo(() => [...makeTieQuestions(rawReceive, "receive"), ...makeTieQuestions(rawGive, "give")], [rawReceive, rawGive]);
+  const receive = useMemo(() => rankWithTies(rawReceive, tieChoices.receive), [rawReceive, tieChoices.receive]); const give = useMemo(() => rankWithTies(rawGive, tieChoices.give), [rawGive, tieChoices.give]);
+  useEffect(() => { if (phase === "quiz" || phase === "tiebreak") window.scrollTo({ top: 0, behavior: "smooth" }); }, [index, tieIndex, phase]);
+  const choose = (n: number) => { const next = [...answers]; next[index] = n; setAnswers(next); window.setTimeout(() => { if (index < 29) setIndex(index + 1); else { const nextReceive = calc(next, "receive"); const nextGive = calc(next, "give"); const hasTies = makeTieQuestions(nextReceive, "receive").length + makeTieQuestions(nextGive, "give").length > 0; setPhase(hasTies ? "tiebreak" : "result"); } }, 180); };
+  const chooseTie = (key: LoveKey) => { const q = tieQuestions[tieIndex]; setTieChoices(current => ({ ...current, [q.mode]: [...current[q.mode], key] })); window.setTimeout(() => tieIndex === tieQuestions.length - 1 ? setPhase("result") : setTieIndex(tieIndex + 1), 180); };
+  const restart = () => { setAnswers(Array(30).fill(0)); setIndex(0); setTieIndex(0); setTieChoices({ receive: [], give: [] }); setPhase("quiz"); setPosterOpen(false); };
   const createPoster = async () => {
     setPosterOpen(true); await new Promise(r => setTimeout(r, 40)); const canvas = canvasRef.current; if (!canvas) return; const ctx = canvas.getContext("2d"); if (!ctx) return; canvas.width = 1080; canvas.height = 1440;
     const grad = ctx.createLinearGradient(0, 0, 1080, 1440); grad.addColorStop(0, "#fffaf4"); grad.addColorStop(1, "#f4e3dd"); ctx.fillStyle = grad; ctx.fillRect(0, 0, 1080, 1440);
@@ -68,6 +107,7 @@ export default function Home() {
 
   if (phase === "intro") return <main className="home"><nav><div className="brand"><span>五</span> 爱的语言</div><div className="nav-note">双向关系自测</div></nav><section className="hero"><div className="hero-copy"><p className="kicker">LOVE FLOWS BOTH WAYS</p><h1>你期待怎样被爱，<br />又习惯怎样去爱？</h1><p className="lead">爱并不只有一种表达方式。这份双向测试，帮你分别看见自己的接收偏好与付出习惯。</p><button className="primary" onClick={() => setPhase("quiz")}>开始探索 <span>→</span></button><div className="meta"><span>30 道原创题目</span><i /><span>约 5 分钟</span><i /><span>结果仅留在本机</span></div></div><div className="love-orbit" aria-label="五种爱的语言"><div className="orbit-core"><small>LOVE</small><strong>爱</strong><em>向内感受<br />向外流动</em></div>{(Object.keys(LOVE) as LoveKey[]).map((k, i) => <div key={k} className={`orbit-tag tag-${i}`}><b>{LOVE[k].short}</b><span>{LOVE[k].name}</span></div>)}</div></section><section className="promise"><div><b>01</b><h2>看见需要</h2><p>了解什么最容易让你感到被珍惜。</p></div><div><b>02</b><h2>理解表达</h2><p>发现你最自然、最常用的付出方式。</p></div><div><b>03</b><h2>让爱抵达</h2><p>用更具体的语言开启一场关系对话。</p></div></section><footer>基于“爱的五种语言”概念设计的非诊断性自我探索工具</footer></main>;
   if (phase === "quiz") { const q = questions[index]; const done = answers.filter(Boolean).length; return <main className="quiz-page"><header className="quiz-head"><button className="mini-brand" onClick={() => setPhase("intro")}><span>五</span> 爱的语言</button><div className="step-text">{q.mode === "receive" ? "第一部分 · 我如何接收爱" : "第二部分 · 我如何给予爱"}</div><div className="count">{String(index + 1).padStart(2, "0")} / 30</div></header><div className="progress"><span style={{ width: `${(done / 30) * 100}%` }} /></div><section className="question-wrap"><div className="question-no">QUESTION {String(index + 1).padStart(2, "0")}</div><h1>{q.text}</h1><p>凭第一感觉，选择它与你真实状态的相符程度</p><div className="scale">{scale.map(s => <button key={s.n} className={answers[index] === s.n ? "selected" : ""} onClick={() => choose(s.n)}><b>{s.n}</b><span>{s.label}</span></button>)}</div><div className="quiz-actions"><button disabled={index === 0} onClick={() => setIndex(index - 1)}>← 上一题</button><span>没有标准答案，诚实就是最好的答案</span><button disabled={!answers[index] || index === 29} onClick={() => setIndex(index + 1)}>下一题 →</button></div></section></main>; }
+  if (phase === "tiebreak") { const q = tieQuestions[tieIndex]; return <main className="quiz-page tie-page"><header className="quiz-head"><div className="mini-brand"><span>五</span> 爱的语言</div><div className="step-text">再靠近一点 · {q.mode === "receive" ? "我如何接收爱" : "我如何给予爱"}</div><div className="count">{tieIndex + 1} / {tieQuestions.length}</div></header><div className="progress"><span style={{ width: `${((tieIndex + 1) / tieQuestions.length) * 100}%` }} /></div><section className="question-wrap tie-wrap"><div className="question-no">A GENTLE TIEBREAKER</div><h1>如果此刻只能保留一种，<br />哪一个对你更重要？</h1><p>你的几种爱的语言都很突出。没有两全选项，请凭第一感觉选择。</p><div className="tie-options"><button onClick={() => chooseTie(q.a)}><small>{LOVE[q.a].name}</small><strong>{tieCopy[q.mode][q.a]}</strong><span>选择这个 →</span></button><i>或</i><button onClick={() => chooseTie(q.b)}><small>{LOVE[q.b].name}</small><strong>{tieCopy[q.mode][q.b]}</strong><span>选择这个 →</span></button></div><div className="tie-note">决胜选择只用于排列分数接近的类型，不会改变你的原始五维分数</div></section></main>; }
   return <main className="result-page"><header className="result-head"><div className="mini-brand"><span>五</span> 爱的语言</div><button onClick={restart}>重新测试 ↻</button></header><section className="result-intro"><p className="kicker">YOUR LOVE PROFILE</p><h1>爱，从看见彼此开始。</h1><p>你的接收偏好与付出方式不必相同。差异不是问题，它是理解自己与重要之人的新入口。</p></section><div className="result-grid"><ResultList title={LOVE[receive[0].key].name} eyebrow="我喜欢这样被爱" data={receive} mode="receive"/><ResultList title={LOVE[give[0].key].name} eyebrow="我愿意这样去爱" data={give} mode="give"/></div><section className="insight"><div className="insight-mark">“</div><div><span>给你的关系提示</span><h2>{receive[0].key === give[0].key ? "你的爱，表达与接收有着自然的一致性。" : "你给予爱的方式，未必是你最渴望收到的方式。"}</h2><p>{receive[0].key === give[0].key ? `你很容易理解同样偏爱“${LOVE[receive[0].key].name}”的人。也别忘了询问对方真正需要什么，让熟悉的表达持续保有新鲜感。` : `你偏爱通过“${LOVE[receive[0].key].name}”感受爱，却更常用“${LOVE[give[0].key].name}”表达爱。把这份差异说出来，也好奇对方的答案，爱就更容易抵达。`}</p></div></section><section className="all-loves"><h2>五种爱的语言，没有高低之分</h2><div>{(Object.keys(LOVE) as LoveKey[]).map(k => <article key={k}><i style={{ background: LOVE[k].color }} /><h3>{LOVE[k].name}</h3><p>{LOVE[k].desc}</p></article>)}</div></section><section className="share"><div><p>把理解，带进一段关系</p><h2>生成你的专属结果海报</h2><span>邀请重要的人也测一测，再交换彼此的答案。</span></div><button className="primary" onClick={createPoster}>生成分享海报 <span>↗</span></button></section><p className="disclaimer">本测试用于自我探索与关系沟通，不构成心理测评或专业诊断。人的偏好会随情境与阶段变化，身体接触始终以双方自愿、舒适和尊重边界为前提。</p>{posterOpen && <div className="modal" role="dialog" aria-modal="true" aria-label="分享海报"><button className="close" onClick={() => setPosterOpen(false)}>×</button><div className="poster-box"><canvas ref={canvasRef} /><div><button className="primary" onClick={download}>下载高清海报</button><p>长按图片也可保存到手机</p></div></div></div>}</main>;
 }
 
