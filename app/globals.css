@@ -167,16 +167,6 @@ nav,
   line-height: 1.9;
   font-size: 17px;
 }
-.answer-guide {
-  max-width: 560px;
-  margin: 20px 0 2px;
-  padding: 14px 16px;
-  border-left: 3px solid rgba(185, 85, 72, 0.55);
-  background: rgba(255, 255, 255, 0.48);
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.8;
-}
 .resume-notice {
   max-width: 560px;
   margin-top: 20px;
@@ -1491,29 +1481,33 @@ nav,
 }
 @media (max-width: 800px) {
   .choice-wrap {
-    padding-top: 86px;
+    padding: 58px 10px 24px;
   }
   .choice-prompt {
-    margin-top: 14px !important;
-    font-size: 19px !important;
+    margin: 10px auto 0 !important;
+    font-size: 18px !important;
+    line-height: 1.55 !important;
   }
   .choice-note {
-    margin: -16px 0 24px !important;
+    margin: 12px 0 18px !important;
   }
   .binary-options {
-    margin: 22px auto 34px;
-    grid-template-columns: 1fr;
-    gap: 10px;
+    margin: 18px auto 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
   }
   .binary-options button {
-    min-height: 0;
-    padding: 24px;
+    min-height: 196px;
+    padding: 16px 13px;
+    text-align: center;
   }
   .binary-options .neutral-choice {
+    min-height: 58px;
     grid-template-columns: 27px 1fr;
-    padding: 20px 24px;
+    padding: 13px 18px;
+    text-align: left;
   }
-  .binary-options .neutral-choice > span {
+  .binary-options button > span {
     display: none;
   }
   .binary-options button:hover,
@@ -1525,12 +1519,25 @@ nav,
     height: 27px;
   }
   .binary-options strong {
-    margin: 15px 0 13px;
-    font-size: 17px;
-    line-height: 1.72;
+    margin: 13px 0 0;
+    font-size: 14px;
+    line-height: 1.62;
+  }
+  .binary-options .neutral-choice strong {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
   }
   .binary-options span {
     font-size: 10px;
+  }
+  .quiz-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    margin: 0 -10px;
+    padding: 16px 10px 8px;
+    background: linear-gradient(transparent, #fffaf4 28%);
   }
 }
 @media (prefers-reduced-motion: reduce) {

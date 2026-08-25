@@ -968,7 +968,7 @@ const questions: Question[] = [
     "gifts",
     "对方路过一家店，带回你之前说过想尝的点心。",
     "acts",
-    "对方记得你一直没空寄快递，主动帮你寄了出去。",
+    "对方知道你最近忙，顺手帮你取回快递。",
   ),
   makeQuestion(
     "receive",
@@ -2274,8 +2274,6 @@ export default function Home() {
             </h1>
             <p className="lead">
               有些人需要一句明确的“我爱你”，有些人需要对方坐下来认真听自己说话；有人会为一份被惦记的小礼物心动，也有人在实际照顾或一个拥抱里感到安心。
-              <br />
-              我们最想收到的爱，不一定是我们最习惯给出去的爱。
             </p>
             {inviterProfile && (
               <div className="invite-arrived">
@@ -2296,19 +2294,13 @@ export default function Home() {
                 </button>
               </div>
             )}
-            <div className="answer-guide">
-              每题的 A、B 代表两种爱的表达，C 代表两种都不太符合。如果 A、B
-              都符合，选择更能打动你或你更常做的那个。答案没有对错，身体接触默认双方都愿意且舒适。
-            </div>
             <button className="primary" onClick={startQuiz}>
-              {hasSavedProgress ? "继续上次测试" : "开始探索"} <span>→</span>
+              {hasSavedProgress ? "继续上次测试" : "开始探索"}
             </button>
             <div className="meta">
               <span>30 道情境三选一</span>
               <i />
               <span>约 5 分钟</span>
-              <i />
-              <span>匿名统计，不保存逐题答案</span>
             </div>
           </div>
           <div className="love-orbit" aria-label="五种爱的语言">
@@ -2348,10 +2340,6 @@ export default function Home() {
             <p>用更具体的语言开启一场关系对话。</p>
           </div>
         </section>
-        <footer>
-          基于“爱的五种语言”概念设计的非诊断性自我探索工具 ·
-          匿名记录访问、完成情况与最终结果，不收集姓名、联系方式及逐题答案
-        </footer>
       </main>
     );
   if (phase === "quiz") {
