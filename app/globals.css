@@ -205,6 +205,7 @@ nav,
   margin: auto;
   border: 1px solid rgba(185, 85, 72, 0.25);
   border-radius: 50%;
+  animation: love-orbit-spin 48s linear infinite;
 }
 .love-orbit:before,
 .love-orbit:after {
@@ -230,6 +231,7 @@ nav,
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  animation: love-orbit-counter-spin 48s linear infinite;
 }
 .orbit-core small {
   color: var(--rose);
@@ -261,6 +263,17 @@ nav,
   align-items: center;
   gap: 8px;
   box-shadow: 0 8px 24px rgba(66, 42, 36, 0.08);
+  animation: love-orbit-counter-spin 48s linear infinite;
+}
+@keyframes love-orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes love-orbit-counter-spin {
+  to {
+    transform: rotate(-360deg);
+  }
 }
 .orbit-tag b {
   display: grid;
@@ -1333,6 +1346,11 @@ nav,
   * {
     scroll-behavior: auto !important;
     transition: none !important;
+  }
+  .love-orbit,
+  .orbit-core,
+  .orbit-tag {
+    animation: none !important;
   }
 }
 @media (hover: none), (pointer: coarse) {
