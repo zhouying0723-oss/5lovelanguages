@@ -490,9 +490,11 @@ function decodeProfile(value: string | null): MatchProfile | null {
 function MatchReport({
   inviter,
   mine,
+  onCreatePoster,
 }: {
   inviter: MatchProfile;
   mine: MatchProfile;
+  onCreatePoster: () => void;
 }) {
   const fit = (need: number[], expression: number[]) =>
     Math.round(
@@ -582,6 +584,9 @@ function MatchReport({
           <li>做完后询问“这次有被你收到吗”，再按真实感受调整。</li>
         </ol>
       </div>
+      <button className="primary match-poster-button" onClick={onCreatePoster}>
+        生成默契度分享海报 <span>↗</span>
+      </button>
     </section>
   );
 }
@@ -1088,6 +1093,172 @@ export default function Home() {
     ctx.fillText("LOVE FLOWS BOTH WAYS", 74, 1382);
     setPosterUrl(canvas.toDataURL("image/png"));
   };
+  const createMatchPoster = async () => {
+    if (!inviterProfile) return;
+    trackEvent("poster_generate", attemptIdRef.current);
+    setShareHint("");
+    setPosterUrl("");
+    setPosterOpen(true);
+    await new Promise((resolve) => setTimeout(resolve, 40));
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    const mine: MatchProfile = {
+      receive: LOVE_KEYS.map(
+        (key) => receive.find((item) => item.key === key)?.score ?? 0,
+      ),
+      give: LOVE_KEYS.map(
+        (key) => give.find((item) => item.key === key)?.score ?? 0,
+      ),
+    };
+    const fit = (need: number[], expression: number[]) =>
+      Math.round(
+        100 -
+          (need.reduce(
+            (sum, score, i) => sum + Math.abs(score - expression[i]),
+            0,
+          ) /
+            20) *
+            100,
+      );
+    const receiveFit = fit(mine.receive, inviterProfile.give);
+    const giveFit = fit(inviterProfile.receive, mine.give);
+    const overall = Math.round((receiveFit + giveFit) / 2);
+    const warmKey = LOVE_KEYS.slice().sort(
+      (a, b) =>
+        Math.min(
+          mine.receive[LOVE_KEYS.indexOf(b)],
+          inviterProfile.give[LOVE_KEYS.indexOf(b)],
+        ) -
+        Math.min(
+          mine.receive[LOVE_KEYS.indexOf(a)],
+          inviterProfile.give[LOVE_KEYS.indexOf(a)],
+        ),
+    )[0];
+    const gapKey = LOVE_KEYS.slice().sort(
+      (a, b) =>
+        Math.abs(
+          mine.receive[LOVE_KEYS.indexOf(b)] -
+            inviterProfile.give[LOVE_KEYS.indexOf(b)],
+        ) -
+        Math.abs(
+          mine.receive[LOVE_KEYS.indexOf(a)] -
+            inviterProfile.give[LOVE_KEYS.indexOf(a)],
+        ),
+    )[0];
+    const level =
+      overall >= 80
+        ? "很会接住彼此"
+        : overall >= 60
+          ? "有默契，也有探索空间"
+          : "爱的翻译比爱的多少更重要";
+    canvas.width = 1080;
+    canvas.height = 1440;
+    const gradient = ctx.createLinearGradient(0, 0, 1080, 1440);
+    gradient.addColorStop(0, "#fffaf4");
+    gradient.addColorStop(1, "#efd9d2");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1080, 1440);
+    ctx.fillStyle = "#b95548";
+    ctx.beginPath();
+    ctx.arc(930, 90, 270, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#8f443c";
+    ctx.font = "600 27px 'PingFang SC', sans-serif";
+    ctx.fillText("爱的五种语言 · 双人报告", 70, 105);
+    ctx.fillStyle = "#382824";
+    ctx.font = "700 58px 'Songti SC', serif";
+    ctx.fillText("我们的爱，有没有被彼此接住？", 70, 195);
+    ctx.fillStyle = "#79635c";
+    ctx.font = "400 24px 'PingFang SC', sans-serif";
+    ctx.fillText("两个人的需要与表达，正在这里相遇", 72, 245);
+    ctx.fillStyle = "rgba(255,255,255,.92)";
+    roundRect(ctx, 64, 300, 952, 380, 34);
+    ctx.fill();
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#b95548";
+    ctx.font = "600 23px 'PingFang SC', sans-serif";
+    ctx.fillText("双向爱语默契度", 540, 365);
+    ctx.font = "700 150px Georgia,serif";
+    ctx.fillText(`${overall}%`, 540, 520);
+    ctx.fillStyle = "#382824";
+    ctx.font = "700 38px 'Songti SC', serif";
+    ctx.fillText(level, 540, 590);
+    ctx.fillStyle = "#79635c";
+    ctx.font = "500 20px 'PingFang SC', sans-serif";
+    ctx.fillText(
+      `对方表达 → 你的需要 ${receiveFit}% · 你的表达 → 对方需要 ${giveFit}%`,
+      540,
+      640,
+    );
+    ctx.textAlign = "left";
+    const insightCard = (
+      x: number,
+      title: string,
+      key: LoveKey,
+      copy: string,
+      color: string,
+    ) => {
+      ctx.fillStyle = "rgba(255,255,255,.88)";
+      roundRect(ctx, x, 720, 456, 315, 28);
+      ctx.fill();
+      ctx.fillStyle = color;
+      ctx.font = "600 20px 'PingFang SC', sans-serif";
+      ctx.fillText(title, x + 35, 775);
+      ctx.fillStyle = "#382824";
+      ctx.font = "700 38px 'Songti SC', serif";
+      ctx.fillText(LOVE[key].name, x + 35, 840);
+      ctx.fillStyle = "#79635c";
+      ctx.font = "400 21px 'PingFang SC', sans-serif";
+      wrapText(ctx, copy, x + 35, 900, 385, 34);
+    };
+    insightCard(
+      64,
+      "你们容易彼此接住",
+      warmKey,
+      "这是你们可以继续创造、反复确认的共同语言。",
+      "#557f70",
+    );
+    insightCard(
+      560,
+      "最值得主动翻译",
+      gapKey,
+      "差异不代表不爱，只要更明确地说出怎样做会更容易被收到。",
+      "#b95548",
+    );
+    ctx.fillStyle = "#4e7568";
+    roundRect(ctx, 64, 1075, 952, 180, 28);
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.font = "700 28px 'Songti SC', serif";
+    ctx.fillText("给我们的一个小练习", 105, 1125);
+    ctx.fillStyle = "#e1ebe7";
+    ctx.font = "400 21px 'PingFang SC', sans-serif";
+    ctx.fillText(
+      "各自说出最近一次感到被爱的瞬间，再为对方做一件能被收到的小事。",
+      105,
+      1175,
+    );
+    ctx.fillText("做完后问一句：这次，有被你收到吗？", 105, 1215);
+    const qr = await QRCode.toDataURL("https://zhouying.cn/5lovelanguages", {
+      width: 180,
+      margin: 2,
+      color: { dark: "#382824", light: "#fffaf4" },
+    });
+    const qrImage = new Image();
+    qrImage.src = qr;
+    await new Promise<void>((resolve) => {
+      qrImage.onload = () => resolve();
+    });
+    ctx.drawImage(qrImage, 72, 1280, 110, 110);
+    ctx.fillStyle = "#382824";
+    ctx.font = "600 22px 'PingFang SC', sans-serif";
+    ctx.fillText("扫码，和重要的人一起发现爱的语言", 210, 1332);
+    ctx.fillStyle = "#79635c";
+    ctx.font = "400 18px sans-serif";
+    ctx.fillText("zhouying.cn/5lovelanguages", 210, 1370);
+    setPosterUrl(canvas.toDataURL("image/png"));
+  };
   const posterFile = async () => {
     const blob = await (await fetch(posterUrl)).blob();
     return new File([blob], "我的爱的语言.png", { type: "image/png" });
@@ -1417,6 +1588,7 @@ export default function Home() {
       {inviterProfile ? (
         <MatchReport
           inviter={inviterProfile}
+          onCreatePoster={createMatchPoster}
           mine={{
             receive: LOVE_KEYS.map(
               (key) => receive.find((item) => item.key === key)?.score ?? 0,
