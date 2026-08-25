@@ -13,25 +13,49 @@ cp "/tmp/$SERVICE" "/etc/systemd/system/$SERVICE"
 
 python3 - "$NGINX_CONF" <<'PY'
 from pathlib import Path
-import sys, time
+import re, sys, time
 
 target = Path(sys.argv[1])
 snippet = Path("/tmp/nginx-api-location.conf").read_text()
 text = target.read_text()
 marker = "location ^~ /5lovelanguages/api/"
-if marker not in text:
-    server_pos = text.find("server_name zhouying.cn")
-    if server_pos < 0:
-        raise SystemExit("未找到 zhouying.cn 的 Nginx server 块")
-    location_pos = text.find("    location / {", server_pos)
-    if location_pos < 0:
+blocks = []
+for match in re.finditer(r"(?m)^\s*server\s*\{", text):
+    depth, end = 0, None
+    for pos in range(match.start(), len(text)):
+        if text[pos] == "{": depth += 1
+        elif text[pos] == "}":
+            depth -= 1
+            if depth == 0:
+                end = pos + 1
+                break
+    if end:
+        block = text[match.start():end]
+        if re.search(r"\bserver_name\s+zhouying\.cn(?:\s|;)", block):
+            blocks.append((match.start(), end, block))
+
+if not blocks:
+    raise SystemExit("未找到 zhouying.cn 的 Nginx server 块")
+
+insertions = []
+for start, _, block in blocks:
+    if marker in block:
+        continue
+    location = re.search(r"(?m)^[ \t]+location\s+/\s*\{", block)
+    if not location:
         raise SystemExit("未找到可插入 API 路由的位置")
+    insertions.append(start + location.start())
+
+if insertions:
     backup = target.with_suffix(target.suffix + f".bak-{int(time.time())}")
     backup.write_text(text)
-    target.write_text(text[:location_pos] + snippet + "\n" + text[location_pos:])
+    for position in reversed(insertions):
+        text = text[:position] + snippet + "\n" + text[position:]
+    target.write_text(text)
     print(f"已备份 Nginx 配置到 {backup}")
+    print(f"已向 {len(insertions)} 个 zhouying.cn 服务块补充 API 路由")
 else:
-    print("Nginx API 路由已存在")
+    print("所有 zhouying.cn 服务块均已有 API 路由")
 PY
 
 nginx -t
