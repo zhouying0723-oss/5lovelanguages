@@ -35,3 +35,4 @@ nav,.quiz-head,.result-head { height:86px; max-width:1180px; margin:auto; paddin
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 @media (hover:none), (pointer:coarse){.scale button:hover:not(.selected){transform:none;border-color:#dfcec7;background:rgba(255,255,255,.65);color:var(--ink);box-shadow:none}}
 @media(max-width:800px){.tie-wrap{padding-top:72px}.tie-wrap h1{font-size:27px}.tie-options{margin:34px auto 24px;grid-template-columns:1fr;gap:10px}.tie-options>i{padding:2px}.tie-options>button{min-height:150px;padding:24px}.tie-options strong{margin:15px 0;font-size:19px}.tie-options>button:hover{transform:none}}
+.tie-badge{display:inline-block;margin-left:9px;padding:3px 7px;border-radius:20px;background:#eadbd4;color:var(--rose);font-size:10px;font-style:normal;font-weight:700;vertical-align:2px}

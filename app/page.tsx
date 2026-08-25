@@ -70,16 +70,16 @@ function makeTieQuestions(data: ReturnType<typeof calc>, mode: "receive" | "give
 function rankWithTies(data: ReturnType<typeof calc>, choices: LoveKey[]) {
   const votes = Object.fromEntries(Object.keys(LOVE).map(k => [k, 0])) as Record<LoveKey, number>;
   choices.forEach(key => { votes[key] += 1; });
-  return data.map(item => ({ ...item, tieVotes: votes[item.key] })).sort((a, b) => {
+  return data.map(item => ({ ...item, tieVotes: votes[item.key], tieRecency: choices.lastIndexOf(item.key) })).sort((a, b) => {
     if (Math.abs(a.score - b.score) > 2) return b.score - a.score;
-    return votes[b.key] - votes[a.key] || b.score - a.score;
+    return votes[b.key] - votes[a.key] || b.tieRecency - a.tieRecency || b.score - a.score;
   });
 }
 
 function ResultList({ title, eyebrow, data, mode }: { title: string; eyebrow: string; data: ReturnType<typeof rankWithTies>; mode: "receive" | "give" }) {
-  const balanced = data[0].score - data[1].score <= 2 && data[0].tieVotes === data[1].tieVotes;
+  const balanced = data[0].score - data[1].score <= 2 && data[0].tieVotes === data[1].tieVotes && data[0].tieRecency === data[1].tieRecency;
   return <section className="result-card"><span className="result-eyebrow">{eyebrow}</span><h2>{balanced ? "多语言均衡型" : title}</h2>
-    <div className="primary-love" style={{ "--accent": LOVE[data[0].key].color } as React.CSSProperties}><div className="rank-mark">01</div><div><strong>{balanced ? `${LOVE[data[0].key].name} · ${LOVE[data[1].key].name}` : LOVE[data[0].key].name}</strong><p>{balanced ? "你的核心偏好非常接近，不必勉强自己只属于一种类型。" : LOVE[data[0].key][mode]}</p></div></div>
+    <div className="primary-love" style={{ "--accent": LOVE[data[0].key].color } as React.CSSProperties}><div className="rank-mark">01</div><div><strong>{balanced ? `${LOVE[data[0].key].name} · ${LOVE[data[1].key].name}` : LOVE[data[0].key].name}</strong>{data[0].tieVotes > 0 && <em className="tie-badge">决胜优先</em>}<p>{balanced ? "你的核心偏好非常接近，不必勉强自己只属于一种类型。" : LOVE[data[0].key][mode]}</p></div></div>
     <div className="bars">{data.map((item, i) => <div className="bar-row" key={item.key}><div className="bar-label"><span>{i + 1}. {LOVE[item.key].name}</span><b>{item.pct}%</b></div><div className="bar-track"><span style={{ width: `${item.pct}%`, background: LOVE[item.key].color }} /></div></div>)}</div>
   </section>;
 }
