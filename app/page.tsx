@@ -2541,7 +2541,7 @@ export default function Home() {
             <p>LOVE, TOGETHER</p>
             <h2>邀请另一半，看看爱有没有被彼此接住</h2>
             <span>
-              对方完成测试后，将生成双向默契度、容易契合与需要翻译的地方，以及具体相处指南。
+              邀请对方完成测试，生成你们的匹配度报告，获得专属相处指南。
             </span>
           </div>
           <button className="primary" onClick={shareMatchInvite}>
