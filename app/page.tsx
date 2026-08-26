@@ -1508,11 +1508,10 @@ function DetailedReport({
 }) {
   const receiveMain = receive[0].key;
   const giveMain = give[0].key;
-  const personal = PERSONAL_RESULT[`${receiveMain}-${giveMain}`];
-  const receiveTotal = 15;
-  const giveTotal = 15;
   const receiveLowSignal = false;
   const giveLowSignal = false;
+  const receiveTotal = 15;
+  const giveTotal = 15;
   const receivePrimary = new Set(
     receiveRanking.possiblePrimaryLanguages.map((item) => LANGUAGE_TO_LOVE[item]),
   );
@@ -1530,16 +1529,6 @@ function DetailedReport({
         <h2>你的双向爱语报告</h2>
         <p>排序来自你在两种爱语之间的选择，不是能力高低，也不是固定不变的人格标签。</p>
       </div>
-      {!receiveLowSignal &&
-        !giveLowSignal &&
-        !receiveLeaders.slice(1).length &&
-        !giveLeaders.slice(1).length && (
-          <div className="personal-summary">
-            <small>你的个人测评结论</small>
-            <h3>{personal.title}</h3>
-            <p>{personal.body}</p>
-          </div>
-        )}
       {(receiveLowSignal || giveLowSignal) && (
         <div className="personal-summary low-signal-summary">
           <small>关于这次结果</small>
@@ -1552,11 +1541,7 @@ function DetailedReport({
       <div className="report-grid">
         <article>
           <small>01 · 内在需要</small>
-          <h3>
-            {receiveLowSignal
-              ? "暂未出现明显的单一偏好"
-              : receiveLeaders.map((item) => LOVE[item.key].name).join(" · ")}
-          </h3>
+          <h3>你在关系中的内在需要</h3>
           {receiveLowSignal ? (
             <p>
               你在“期待怎样被爱”部分选择了 {15 - receiveTotal} 次
@@ -1576,11 +1561,7 @@ function DetailedReport({
         </article>
         <article>
           <small>02 · 自然表达</small>
-          <h3>
-            {giveLowSignal
-              ? "暂未出现明显的单一偏好"
-              : giveLeaders.map((item) => LOVE[item.key].name).join(" · ")}
-          </h3>
+          <h3>你表达爱的自然优势</h3>
           {giveLowSignal ? (
             <p>
               你在“习惯怎样去爱”部分选择了 {15 - giveTotal} 次

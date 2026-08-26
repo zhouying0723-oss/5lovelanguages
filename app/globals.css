@@ -909,6 +909,9 @@ nav,
   line-height: 1.9;
 }
 .report-secondary {
+  display: none;
+}
+.report-secondary {
   margin-top: 24px;
   padding: 28px 32px;
   background: #f5e7e1;
