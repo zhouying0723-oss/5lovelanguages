@@ -790,14 +790,6 @@ nav,
   border-radius: 50%;
   background: #fff;
 }
-.pie-chart > span {
-  grid-area: 1/1;
-  z-index: 1;
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.45;
-  text-align: center;
-}
 .pie-legend > div {
   display: grid;
   grid-template-columns: 10px 1fr 34px;

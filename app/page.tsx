@@ -1514,10 +1514,6 @@ function ResultList({
             background: chosenTotal ? `conic-gradient(${gradient})` : "#f0e5df",
           }}
         >
-          <span>
-            已选择 {chosenTotal}
-            <br />C 选项 {neutralCount}
-          </span>
         </div>
         <div className="pie-legend">
           {data.map((item) => (
