@@ -2369,12 +2369,6 @@ export default function Home() {
           ranking={giveRanking}
         />
       </div>
-      <DetailedReport
-        receive={receive}
-        give={give}
-        receiveRanking={receiveRanking}
-        giveRanking={giveRanking}
-      />
       {inviterProfile ? (
         <MatchReport
           inviter={inviterProfile}
@@ -2402,15 +2396,7 @@ export default function Home() {
           </button>
         </section>
       )}
-      <section className="insight">
-        <div className="insight-mark">“</div>
-        <div>
-          <span>给你的关系提示</span>
-          <h2>{relationshipTitle}</h2>
-          <p>{relationshipCopy}</p>
-        </div>
-      </section>
-      <section className="share">
+      <section className="share result-share">
         <div>
           <p>把理解，带进一段关系</p>
           <h2>生成你的专属结果海报</h2>
@@ -2419,6 +2405,20 @@ export default function Home() {
         <button className="primary" onClick={createPoster}>
           生成分享海报 <span>↗</span>
         </button>
+      </section>
+      <DetailedReport
+        receive={receive}
+        give={give}
+        receiveRanking={receiveRanking}
+        giveRanking={giveRanking}
+      />
+      <section className="insight">
+        <div className="insight-mark">“</div>
+        <div>
+          <span>给你的关系提示</span>
+          <h2>{relationshipTitle}</h2>
+          <p>{relationshipCopy}</p>
+        </div>
       </section>
       <p className="disclaimer">
         本测试用于自我探索与关系沟通，不构成心理测评或专业诊断。人的偏好会随情境与阶段变化，身体接触始终以双方自愿、舒适和尊重边界为前提。
