@@ -1444,10 +1444,15 @@ function ResultList({
   );
   const primaryNames = primaryKeys.map((key) => LOVE[key].name).join(" 或 ");
   const remaining = data.filter((item) => !primaryKeys.includes(item.key));
+  const primaryRankLabel = primaryKeys.length > 1 ? "第 1 名（并列）" : "第 1 名";
   return (
     <section className="result-card">
       <span className="result-eyebrow">{eyebrow}</span>
-      <h2>{primaryNames || title}</h2>
+      <div className="ranking-primary">
+        <i className="rank-flag" aria-hidden="true">⚑</i>
+        <b>{primaryRankLabel}</b>
+        <h2>{primaryNames || title}</h2>
+      </div>
       {primaryKeys.length > 1 && (
         <p className="ranking-note">首要偏好非常接近，现有答案暂未稳定分出先后。</p>
       )}
@@ -1458,18 +1463,13 @@ function ResultList({
         <div className="pie-legend">
           {remaining.map((item) => (
             <div key={item.key}>
-              <i
-                className="rank-icon"
-                style={{ background: LOVE[item.key].color }}
-              >
-                {item.minRank}
-              </i>
-              <span>{LOVE[item.key].name}</span>
+              <i className="rank-flag" aria-hidden="true">⚑</i>
               <b>
                 {item.minRank === item.maxRank
                   ? `第 ${item.minRank} 名`
                   : `第 ${item.minRank}–${item.maxRank} 名`}
               </b>
+              <span>{LOVE[item.key].name}</span>
             </div>
           ))}
         </div>

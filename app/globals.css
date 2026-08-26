@@ -793,18 +793,53 @@ nav,
   font-size: 14px;
 }
 .ranking-result .pie-legend > div > span {
+  order: 3;
   flex: 1 1 auto;
   min-width: 0;
   white-space: nowrap;
 }
 .ranking-result .pie-legend > div > b {
+  order: 2;
   flex: 0 0 80px;
+  text-align: left;
+}
+.ranking-result .pie-legend > div > .rank-flag {
+  order: 1;
 }
 .ranking-note {
   margin: 8px 0 0;
   color: var(--muted);
   font-size: 12px;
   line-height: 1.6;
+}
+.ranking-primary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+.ranking-primary h2 {
+  margin: 0;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.ranking-primary > b {
+  flex: 0 0 auto;
+  color: var(--ink);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.rank-flag {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  width: 28px !important;
+  height: 28px !important;
+  color: var(--rose);
+  font-size: 25px;
+  font-style: normal;
+  line-height: 1;
 }
 .ranking-result .pie-legend b {
   width: auto;
