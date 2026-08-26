@@ -1443,7 +1443,7 @@ function ResultList({
     (language) => LANGUAGE_TO_LOVE[language],
   );
   const primaryNames = primaryKeys.map((key) => LOVE[key].name).join(" 或 ");
-  const primaryRankLabel = primaryKeys.length > 1 ? "第 1 名（并列）" : "第 1 名";
+  const primaryRankLabel = primaryKeys.length > 1 ? "No.1（并列）" : "No.1";
   const direction = eyebrow.includes("被爱") ? "receive" : "give";
   return (
     <section className="result-card">
@@ -1461,8 +1461,8 @@ function ResultList({
           <div className="ranking-row" key={item.key} role="listitem">
             <span className="rank-mark" aria-hidden="true">✦</span>
             <b>{item.minRank === item.maxRank
-              ? `第 ${item.minRank} 名`
-              : `第 ${item.minRank}–${item.maxRank} 名`}</b>
+              ? `No.${item.minRank}`
+              : `No.${item.minRank}–${item.maxRank}`}</b>
             <span>{LOVE[item.key].name}</span>
           </div>
         ))}
