@@ -775,6 +775,13 @@ nav,
   align-items: center;
   gap: 30px;
 }
+.ranking-result {
+  grid-template-columns: 1fr;
+}
+.ranking-result .pie-legend b {
+  width: auto;
+  white-space: nowrap;
+}
 .pie-chart {
   width: 145px;
   height: 145px;

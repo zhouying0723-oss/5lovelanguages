@@ -17,6 +17,6 @@ test("renders the love languages test landing page", async () => {
   const html = await response.text();
   assert.match(html, /爱的五种语言/);
   assert.match(html, /你期待怎样被爱/);
-  assert.match(html, /30 道原创题目/);
+  assert.match(html, /20 道核心题/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/);
 });

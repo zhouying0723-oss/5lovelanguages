@@ -2,12 +2,37 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
+import {
+  calculateResult,
+  CORE_PAIRS,
+  createAnswer,
+  getNextTestStep,
+  type Answer as AdaptiveAnswer,
+  type Choice,
+  type Dimension,
+  type Language,
+  type Question as AdaptiveQuestion,
+  type RankingResult,
+} from "./adaptive-test";
 
 type LoveKey = "words" | "time" | "gifts" | "acts" | "touch";
-type Answer = LoveKey | "none";
-type Phase = "intro" | "quiz" | "tiebreak" | "result";
+type Phase = "intro" | "quiz" | "result";
 type MatchProfile = { receive: number[]; give: number[] };
 const LOVE_KEYS: LoveKey[] = ["words", "time", "gifts", "acts", "touch"];
+const LANGUAGE_TO_LOVE: Record<Language, LoveKey> = {
+  W: "words",
+  Q: "time",
+  G: "gifts",
+  A: "acts",
+  T: "touch",
+};
+const LOVE_TO_LANGUAGE: Record<LoveKey, Language> = {
+  words: "W",
+  time: "Q",
+  gifts: "G",
+  acts: "A",
+  touch: "T",
+};
 
 function LoveMark() {
   return <span className="heart-mark" aria-hidden="true" />;
@@ -966,7 +991,7 @@ const questions: Question[] = [
     "receive",
     "平日里，哪件事更容易让你觉得自己被放在心上？",
     "gifts",
-    "对方路过一家店，带回你之前说过想尝的点心。",
+    "对方路过一家店，带回一份看到时想起你的小点心。",
     "acts",
     "对方知道你最近忙，顺手帮你取回快递。",
   ),
@@ -1032,7 +1057,7 @@ const questions: Question[] = [
     "words",
     "对方认真说出：“我都看到了，也真的很感谢你。”",
     "gifts",
-    "对方为你准备一件你一直想要的小东西。",
+    "对方写了一张卡片，或准备一件能看出他记得你的小纪念。",
   ),
   makeQuestion(
     "receive",
@@ -1196,10 +1221,71 @@ const questions: Question[] = [
   ),
 ];
 
-const PROGRESS_KEY = "love_language_quiz_progress_v3";
+function toAdaptiveQuestion(
+  question: Question,
+  id: string,
+  storyOrder: number,
+  isFollowUp = false,
+): AdaptiveQuestion {
+  return {
+    id,
+    dimension: question.mode,
+    storyOrder,
+    optionALanguage: LOVE_TO_LANGUAGE[question.options[0].key],
+    optionBLanguage: LOVE_TO_LANGUAGE[question.options[1].key],
+    content: question.scene,
+    optionAText: question.options[0].text,
+    optionBText: question.options[1].text,
+    isFollowUp,
+  };
+}
+
+const receiveCore = questions
+  .filter((question) => question.mode === "receive")
+  .slice(0, 10)
+  .map((question, index) => ({
+    ...toAdaptiveQuestion(
+      question,
+      `R${String(index + 1).padStart(2, "0")}`,
+      index + 1,
+    ),
+    optionALanguage: CORE_PAIRS.receive[index][0],
+    optionBLanguage: CORE_PAIRS.receive[index][1],
+  }));
+const giveCore = questions
+  .filter((question) => question.mode === "give")
+  .slice(0, 10)
+  .map((question, index) => ({
+    ...toAdaptiveQuestion(
+      question,
+      `G${String(index + 1).padStart(2, "0")}`,
+      index + 1,
+    ),
+    optionALanguage: CORE_PAIRS.give[index][0],
+    optionBLanguage: CORE_PAIRS.give[index][1],
+  }));
+export const adaptiveCoreQuestions = [...receiveCore, ...giveCore];
+
+export const adaptiveFollowUpQuestions = [legacyQuestions, questionsV2].flatMap(
+  (source, bankIndex) =>
+    (["receive", "give"] as Dimension[]).flatMap((dimension) =>
+      source
+        .filter((question) => question.mode === dimension)
+        .slice(0, 10)
+        .map((question, index) =>
+          toAdaptiveQuestion(
+            question,
+            `${dimension === "receive" ? "RF" : "GF"}${bankIndex + 1}-${String(index + 1).padStart(2, "0")}`,
+            index + 1,
+            true,
+          ),
+        ),
+    ),
+);
+
+const PROGRESS_KEY = "love_language_quiz_progress_v4";
 type SavedProgress = {
-  answers: Array<Answer | null>;
-  index: number;
+  answers: AdaptiveAnswer[];
   attemptId: string;
 };
 function loadSavedProgress(): SavedProgress | null {
@@ -1209,16 +1295,14 @@ function loadSavedProgress(): SavedProgress | null {
     ) as SavedProgress | null;
     if (
       !parsed ||
-      parsed.answers.length !== questions.length ||
       !parsed.answers.every(
         (answer) =>
-          answer === null || answer === "none" || LOVE_KEYS.includes(answer),
+          typeof answer?.questionId === "string" &&
+          (answer.dimension === "receive" || answer.dimension === "give") &&
+          (answer.choice === "A" || answer.choice === "B" || answer.choice === "C"),
       ) ||
-      !Number.isInteger(parsed.index) ||
-      parsed.index < 0 ||
-      parsed.index >= questions.length ||
-      !parsed.answers.some(Boolean) ||
-      parsed.answers.every(Boolean) ||
+      parsed.answers.length === 0 ||
+      parsed.answers.length >= 26 ||
       !/^[a-zA-Z0-9-]{8,80}$/.test(parsed.attemptId)
     )
       return null;
@@ -1226,40 +1310,6 @@ function loadSavedProgress(): SavedProgress | null {
   } catch {
     return null;
   }
-}
-
-const tieCopy: Record<"receive" | "give", Record<LoveKey, string>> = {
-  receive: {
-    words: "听到对方真诚说出欣赏、感谢与鼓励",
-    time: "拥有一段不被打扰、全心投入的相处时间",
-    gifts: "收到一份专门为我挑选、带着心意的小礼物",
-    acts: "对方主动替我分担一件现实中的麻烦事",
-    touch: "在彼此舒适和同意时，得到一个温暖的拥抱",
-  },
-  give: {
-    words: "把欣赏、感谢与鼓励清楚地说给对方听",
-    time: "放下其他事情，专心陪伴和倾听对方",
-    gifts: "为对方挑选或制作一份有个人意义的心意",
-    acts: "主动完成一件能真正减轻对方负担的事情",
-    touch: "在对方愿意时，用拥抱或牵手表达亲近",
-  },
-};
-
-function calc(answers: Array<Answer | null>, mode: "receive" | "give") {
-  const totals = Object.fromEntries(
-    Object.keys(LOVE).map((k) => [k, 0]),
-  ) as Record<LoveKey, number>;
-  questions.forEach((q, i) => {
-    const key = answers[i];
-    if (q.mode === mode && key && key !== "none") totals[key] += 1;
-  });
-  return (Object.keys(LOVE) as LoveKey[])
-    .map((key) => ({
-      key,
-      score: totals[key],
-      pct: Math.round((totals[key] / 6) * 100),
-    }))
-    .sort((a, b) => b.score - a.score);
 }
 
 function encodeProfile(profile: MatchProfile) {
@@ -1387,140 +1437,78 @@ function MatchReport({
   );
 }
 
-type TieGroup = { mode: "receive" | "give"; candidates: LoveKey[] };
-
-function makeTieGroup(
-  data: ReturnType<typeof calc>,
-  mode: "receive" | "give",
-): TieGroup | null {
-  const candidates = data
-    .filter((item) => data[0].score - item.score <= 2)
-    .map((item) => item.key);
-  return candidates.length < 2
-    ? null
-    : { mode, candidates: candidates.slice(0, 5) };
-}
-
-function rankWithTies(
-  data: ReturnType<typeof calc>,
-  choices: LoveKey[],
-  winner?: LoveKey,
-) {
-  const votes = Object.fromEntries(
-    Object.keys(LOVE).map((k) => [k, 0]),
-  ) as Record<LoveKey, number>;
-  choices.forEach((key) => {
-    votes[key] += 1;
-  });
-  const ranked = data
-    .map((item) => ({
-      ...item,
-      tieVotes: votes[item.key],
-      tieRecency: choices.lastIndexOf(item.key),
-      adjustedScore:
-        item.score + votes[item.key] * 1.5 + (winner === item.key ? 3 : 0),
-    }))
-    .sort((a, b) => {
-      if (Math.abs(a.score - b.score) > 2) return b.score - a.score;
-      if (winner && (a.key === winner || b.key === winner))
-        return a.key === winner ? -1 : 1;
-      return (
-        votes[b.key] - votes[a.key] ||
-        b.tieRecency - a.tieRecency ||
-        b.score - a.score
-      );
-    });
-  const maximum = Math.max(...ranked.map((item) => item.adjustedScore), 1);
-  return ranked.map((item) => ({
-    ...item,
-    resultPct: Math.round((item.adjustedScore / maximum) * 100),
-  }));
-}
+type DisplayRankingItem = {
+  key: LoveKey;
+  score: number;
+  pct: number;
+  resultPct: number;
+  tieVotes: number;
+  tieRecency: number;
+  adjustedScore: number;
+  averageRank: number;
+  minRank: number;
+  maxRank: number;
+};
 
 function ResultList({
   title,
   eyebrow,
   data,
   mode,
+  ranking,
 }: {
   title: string;
   eyebrow: string;
-  data: ReturnType<typeof rankWithTies>;
+  data: DisplayRankingItem[];
   mode: "receive" | "give";
+  ranking: RankingResult;
 }) {
-  const leaders = data.filter((item) => item.score === data[0].score);
-  const chosenTotal = data.reduce((sum, item) => sum + item.score, 0);
-  const total = chosenTotal || 1;
-  const neutralCount = 15 - chosenTotal;
-  const lowSignal = chosenTotal <= 7 || data[0].score <= 2;
-  const gradient = data
-    .reduce<{ end: number; segments: string[] }>(
-      (result, item) => {
-        const end = result.end + (item.score / total) * 100;
-        return {
-          end,
-          segments: [
-            ...result.segments,
-            `${LOVE[item.key].color} ${result.end}% ${end}%`,
-          ],
-        };
-      },
-      { end: 0, segments: [] },
-    )
-    .segments.join(",");
+  const primaryKeys = ranking.possiblePrimaryLanguages.map(
+    (language) => LANGUAGE_TO_LOVE[language],
+  );
+  const primaryNames = primaryKeys.map((key) => LOVE[key].name).join(" 或 ");
   return (
     <section className="result-card">
       <span className="result-eyebrow">{eyebrow}</span>
       <h2>
-        {lowSignal
-          ? "偏好尚未集中"
-          : leaders.length > 1
-            ? "并列核心偏好"
-            : title}
+        {primaryKeys.length > 1 ? "首要偏好非常接近" : title}
       </h2>
       <div
         className="primary-love"
         style={
           {
             "--accent":
-              lowSignal || leaders.length > 1
-                ? "#b95548"
-                : LOVE[data[0].key].color,
+              primaryKeys.length > 1 ? "#b95548" : LOVE[data[0].key].color,
           } as React.CSSProperties
         }
       >
         <div className="rank-mark">
-          {lowSignal ? "?" : leaders.length > 1 ? "=" : "01"}
+          {primaryKeys.length > 1 ? "≈" : "01"}
         </div>
         <div>
           <strong>
-            {lowSignal
-              ? "目前没有表现出特别明显的单一偏好"
-              : leaders.map((item) => LOVE[item.key].name).join(" · ")}
+            {primaryKeys.length > 1
+              ? `你的首要爱的语言可能是${primaryNames}`
+              : LOVE[primaryKeys[0]].name}
           </strong>
           <p>
-            {lowSignal
-              ? "你感受到或表达爱，可能更依赖具体情境，现有选项也可能没有充分覆盖你真正重视的方式。"
-              : leaders.length > 1
-                ? `这 ${leaders.length} 项得分相同，共同构成你的核心偏好，不必从中强行选出第一名。`
-                : LOVE[data[0].key][mode]}
+            {primaryKeys.length > 1
+              ? "目前两者非常接近，现有答案还不足以稳定分出先后。"
+              : LOVE[data[0].key][mode]}
           </p>
         </div>
       </div>
-      <div className="pie-result">
-        <div
-          className="pie-chart"
-          style={{
-            background: chosenTotal ? `conic-gradient(${gradient})` : "#f0e5df",
-          }}
-        >
-        </div>
+      <div className="pie-result ranking-result">
         <div className="pie-legend">
           {data.map((item) => (
             <div key={item.key}>
               <i style={{ background: LOVE[item.key].color }} />
               <span>{LOVE[item.key].name}</span>
-              <b>{item.score} 分</b>
+              <b>
+                {item.minRank === item.maxRank
+                  ? `第 ${item.minRank} 名`
+                  : `第 ${item.minRank}–${item.maxRank} 名`}
+              </b>
             </div>
           ))}
         </div>
@@ -1532,36 +1520,37 @@ function ResultList({
 function DetailedReport({
   receive,
   give,
+  receiveRanking,
+  giveRanking,
 }: {
-  receive: ReturnType<typeof rankWithTies>;
-  give: ReturnType<typeof rankWithTies>;
+  receive: DisplayRankingItem[];
+  give: DisplayRankingItem[];
+  receiveRanking: RankingResult;
+  giveRanking: RankingResult;
 }) {
   const receiveMain = receive[0].key;
   const giveMain = give[0].key;
   const personal = PERSONAL_RESULT[`${receiveMain}-${giveMain}`];
-  const receiveTotal = receive.reduce((sum, item) => sum + item.score, 0);
-  const giveTotal = give.reduce((sum, item) => sum + item.score, 0);
-  const receiveLowSignal = receiveTotal <= 7 || receive[0].score <= 2;
-  const giveLowSignal = giveTotal <= 7 || give[0].score <= 2;
-  const receiveLeaders = receive.filter(
-    (item) => item.score === receive[0].score,
+  const receiveTotal = 15;
+  const giveTotal = 15;
+  const receiveLowSignal = false;
+  const giveLowSignal = false;
+  const receivePrimary = new Set(
+    receiveRanking.possiblePrimaryLanguages.map((item) => LANGUAGE_TO_LOVE[item]),
   );
-  const giveLeaders = give.filter((item) => item.score === give[0].score);
-  const receiveSecond =
-    receive[0].score - receive[1].score === 1 &&
-    receive[1].score > receive[2].score
-      ? receive[1]
-      : null;
-  const giveSecond =
-    give[0].score - give[1].score === 1 && give[1].score > give[2].score
-      ? give[1]
-      : null;
+  const givePrimary = new Set(
+    giveRanking.possiblePrimaryLanguages.map((item) => LANGUAGE_TO_LOVE[item]),
+  );
+  const receiveLeaders = receive.filter((item) => receivePrimary.has(item.key));
+  const giveLeaders = give.filter((item) => givePrimary.has(item.key));
+  const receiveSecond = receiveRanking.isComplete ? receive[1] : null;
+  const giveSecond = giveRanking.isComplete ? give[1] : null;
   return (
     <section className="detailed-report">
       <div className="report-heading">
         <span>DETAILED REPORT</span>
         <h2>你的双向爱语报告</h2>
-        <p>分数代表当下的相对偏好，不是能力高低，也不是固定不变的人格标签。</p>
+        <p>排序来自你在两种爱语之间的选择，不是能力高低，也不是固定不变的人格标签。</p>
       </div>
       {!receiveLowSignal &&
         !giveLowSignal &&
@@ -1681,67 +1670,64 @@ function DetailedReport({
 
 export default function Home() {
   const inviteShareReady = useMemo(
-    () => new URLSearchParams(window.location.search).get("invite") === "ready",
+    () =>
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("invite") === "ready",
     [],
   );
   const inviterProfile = useMemo(
     () =>
-      decodeProfile(new URLSearchParams(window.location.search).get("match")),
+      typeof window === "undefined"
+        ? null
+        : decodeProfile(new URLSearchParams(window.location.search).get("match")),
     [],
   );
   const savedProgress = useMemo(() => loadSavedProgress(), []);
   const [phase, setPhase] = useState<Phase>("intro");
-  const [index, setIndex] = useState(savedProgress?.index ?? 0);
-  const [answers, setAnswers] = useState<Array<Answer | null>>(
-    savedProgress?.answers ?? Array(questions.length).fill(null),
+  const [answers, setAnswers] = useState<AdaptiveAnswer[]>(
+    savedProgress?.answers ?? [],
   );
   const [hasSavedProgress, setHasSavedProgress] = useState(
     Boolean(savedProgress),
   );
-  const [tieGroupIndex, setTieGroupIndex] = useState(0);
-  const [tieOpponentIndex, setTieOpponentIndex] = useState(1);
-  const [tieChampion, setTieChampion] = useState<LoveKey | null>(null);
-  const [tieChoices, setTieChoices] = useState<{
-    receive: LoveKey[];
-    give: LoveKey[];
-  }>({ receive: [], give: [] });
-  const [tieWinners, setTieWinners] = useState<
-    Partial<Record<"receive" | "give", LoveKey>>
-  >({});
   const [posterOpen, setPosterOpen] = useState(false);
   const [posterUrl, setPosterUrl] = useState("");
   const [shareHint, setShareHint] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const attemptIdRef = useRef(savedProgress?.attemptId ?? "");
   const completionTrackedRef = useRef(false);
-  const rawReceive = useMemo(() => calc(answers, "receive"), [answers]);
-  const rawGive = useMemo(() => calc(answers, "give"), [answers]);
-  const tieGroups = useMemo(
+  const adaptiveStep = useMemo(
     () =>
-      [
-        makeTieGroup(rawReceive, "receive"),
-        makeTieGroup(rawGive, "give"),
-      ].filter((group): group is TieGroup => group !== null),
-    [rawReceive, rawGive],
+      getNextTestStep(
+        answers,
+        adaptiveCoreQuestions,
+        adaptiveFollowUpQuestions,
+      ),
+    [answers],
   );
-  const receive = useMemo(
-    () => rankWithTies(rawReceive, tieChoices.receive, tieWinners.receive),
-    [rawReceive, tieChoices.receive, tieWinners.receive],
+  const receiveRanking = useMemo(
+    () => calculateResult(answers.filter((answer) => answer.dimension === "receive")),
+    [answers],
   );
-  const give = useMemo(
-    () => rankWithTies(rawGive, tieChoices.give, tieWinners.give),
-    [rawGive, tieChoices.give, tieWinners.give],
+  const giveRanking = useMemo(
+    () => calculateResult(answers.filter((answer) => answer.dimension === "give")),
+    [answers],
   );
-  const tieTotal = tieGroups.reduce(
-    (sum, group) => sum + group.candidates.length - 1,
-    0,
-  );
-  const tieDone =
-    tieGroups
-      .slice(0, tieGroupIndex)
-      .reduce((sum, group) => sum + group.candidates.length - 1, 0) +
-    tieOpponentIndex -
-    1;
+  const toDisplayRanking = (result: RankingResult) =>
+    result.languages.map((item) => ({
+      key: LANGUAGE_TO_LOVE[item.language],
+      score: Number((6 - item.averageRank).toFixed(2)),
+      pct: Math.round(((6 - item.averageRank) / 5) * 100),
+      resultPct: Math.round(((6 - item.averageRank) / 5) * 100),
+      tieVotes: 0,
+      tieRecency: -1,
+      adjustedScore: 6 - item.averageRank,
+      averageRank: item.averageRank,
+      minRank: item.minRank,
+      maxRank: item.maxRank,
+    }));
+  const receive = useMemo(() => toDisplayRanking(receiveRanking), [receiveRanking]);
+  const give = useMemo(() => toDisplayRanking(giveRanking), [giveRanking]);
   useEffect(() => {
     trackEvent("page_view");
   }, []);
@@ -1750,12 +1736,12 @@ export default function Home() {
     try {
       localStorage.setItem(
         PROGRESS_KEY,
-        JSON.stringify({ answers, index, attemptId: attemptIdRef.current }),
+        JSON.stringify({ answers, attemptId: attemptIdRef.current }),
       );
     } catch {
       // Private browsing or storage restrictions should not block the test.
     }
-  }, [phase, answers, index]);
+  }, [phase, answers]);
   useEffect(() => {
     if (phase !== "result" || completionTrackedRef.current) return;
     try {
@@ -1771,47 +1757,28 @@ export default function Home() {
         index: item.resultPct,
       })),
       give: give.map((item) => ({ key: item.key, index: item.resultPct })),
-      usedTiebreak: tieChoices.receive.length + tieChoices.give.length > 0,
+      adaptiveQuestionCount: answers.length,
     });
-  }, [phase, receive, give, tieChoices]);
+  }, [phase, receive, give, answers.length]);
   useEffect(() => {
-    if (phase === "quiz" || phase === "tiebreak")
+    if (phase === "quiz")
       window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [index, tieGroupIndex, tieOpponentIndex, phase]);
-  const choose = (key: Answer) => {
-    const next = [...answers];
-    next[index] = key;
-    setAnswers(next);
+  }, [answers.length, phase]);
+  const choose = (choice: Choice) => {
+    if (adaptiveStep.type !== "question") return;
+    setAnswers((current) => [...current, createAnswer(adaptiveStep.question, choice)]);
     window.setTimeout(() => {
-      if (index < questions.length - 1) setIndex(index + 1);
-      else setPhase("result");
-    }, 180);
-  };
-  const chooseTie = (key: LoveKey) => {
-    const group = tieGroups[tieGroupIndex];
-    setTieChoices((current) => ({
-      ...current,
-      [group.mode]: [...current[group.mode], key],
-    }));
-    window.setTimeout(() => {
-      if (tieOpponentIndex < group.candidates.length - 1) {
-        setTieChampion(key);
-        setTieOpponentIndex(tieOpponentIndex + 1);
-        return;
-      }
-      setTieWinners((current) => ({ ...current, [group.mode]: key }));
-      if (tieGroupIndex < tieGroups.length - 1) {
-        const nextGroup = tieGroups[tieGroupIndex + 1];
-        setTieGroupIndex(tieGroupIndex + 1);
-        setTieOpponentIndex(1);
-        setTieChampion(nextGroup.candidates[0]);
-      } else setPhase("result");
+      const nextAnswers = [...answers, createAnswer(adaptiveStep.question, choice)];
+      const nextStep = getNextTestStep(
+        nextAnswers,
+        adaptiveCoreQuestions,
+        adaptiveFollowUpQuestions,
+      );
+      if (nextStep.type === "result") setPhase("result");
     }, 180);
   };
   const beginFreshQuiz = () => {
-    const freshAnswers = Array<Answer | null>(questions.length).fill(null);
-    setAnswers(freshAnswers);
-    setIndex(0);
+    setAnswers([]);
     attemptIdRef.current = crypto.randomUUID();
     completionTrackedRef.current = false;
     setHasSavedProgress(false);
@@ -1821,17 +1788,12 @@ export default function Home() {
   const startQuiz = () => {
     if (hasSavedProgress) {
       completionTrackedRef.current = false;
-      setPhase("quiz");
+      setPhase(adaptiveStep.type === "result" ? "result" : "quiz");
       return;
     }
     beginFreshQuiz();
   };
   const restart = () => {
-    setTieGroupIndex(0);
-    setTieOpponentIndex(1);
-    setTieChampion(null);
-    setTieChoices({ receive: [], give: [] });
-    setTieWinners({});
     setPosterOpen(false);
     setPosterUrl("");
     setShareHint("");
@@ -1876,12 +1838,10 @@ export default function Home() {
       copy: string,
       accent: string,
     ) => {
-      const leaders = data.filter((item) => item.score === data[0].score);
-      const secondary =
-        leaders.length === 1 && data[1].score > data[2].score ? data[1] : null;
+      const leaders = data.filter((item) => item.minRank === 1);
+      const secondary = leaders.length === 1 ? data[1] : null;
       const chosenTotal = data.reduce((sum, item) => sum + item.score, 0);
       const total = chosenTotal || 1;
-      const lowSignal = chosenTotal <= 7 || data[0].score <= 2;
       ctx.fillStyle = "rgba(255,255,255,.9)";
       roundRect(ctx, 64, y, 952, 360, 34);
       ctx.fill();
@@ -1892,9 +1852,7 @@ export default function Home() {
       ctx.font = `700 ${leaders.length > 2 ? 31 : 42}px 'Songti SC', serif`;
       wrapText(
         ctx,
-        lowSignal
-          ? "偏好尚未集中"
-          : leaders.map((item) => LOVE[item.key].name).join(" · "),
+        leaders.map((item) => LOVE[item.key].name).join(" · "),
         110,
         y + 128,
         540,
@@ -1904,11 +1862,9 @@ export default function Home() {
       ctx.font = "400 22px 'PingFang SC', sans-serif";
       wrapText(
         ctx,
-        lowSignal
-          ? "这次选择了较多 C，感受爱可能更依赖具体情境。"
-          : leaders.length > 1
-            ? "并列核心偏好：这些方式对我同样重要，不作单独排序。"
-            : copy,
+        leaders.length > 1
+          ? "首要偏好非常接近，现有答案暂未稳定分出先后。"
+          : copy,
         110,
         y + 200,
         525,
@@ -1916,11 +1872,9 @@ export default function Home() {
       );
       ctx.font = "500 19px 'PingFang SC', sans-serif";
       ctx.fillText(
-        lowSignal
-          ? `明确选择 C · ${15 - chosenTotal} 次`
-          : secondary
-            ? `第二偏好 · ${LOVE[secondary.key].name}`
-            : "其余偏好较接近，不单独排序",
+        secondary
+          ? `第二偏好 · ${LOVE[secondary.key].name}`
+          : "其余偏好较接近，暂不单独排序",
         110,
         y + 318,
       );
@@ -1942,7 +1896,7 @@ export default function Home() {
       ctx.fillStyle = "#79635c";
       ctx.textAlign = "center";
       ctx.font = "500 17px 'PingFang SC', sans-serif";
-      ctx.fillText(`C ${15 - chosenTotal}次`, 830, y + 171);
+      ctx.fillText("排序", 830, y + 171);
       const legendX = [700, 815, 930, 755, 875];
       data.forEach((item, i) => {
         const yy = y + (i < 3 ? 282 : 312);
@@ -1953,7 +1907,11 @@ export default function Home() {
         ctx.fillStyle = "#79635c";
         ctx.textAlign = "left";
         ctx.font = "500 16px 'PingFang SC', sans-serif";
-        ctx.fillText(`${LOVE[item.key].short} ${item.score}分`, legendX[i], yy);
+        ctx.fillText(
+          `${LOVE[item.key].short} ${item.minRank === item.maxRank ? `第${item.minRank}` : `${item.minRank}-${item.maxRank}`}`,
+          legendX[i],
+          yy,
+        );
       });
       ctx.textAlign = "left";
     };
@@ -1988,7 +1946,7 @@ export default function Home() {
     ctx.fillText("扫码，发现你的爱的语言", 300, 1218);
     ctx.fillStyle = "#79635c";
     ctx.font = "400 23px 'PingFang SC', sans-serif";
-    ctx.fillText("30 道情境二选一 · 约 3 分钟 · 不收集个人信息", 300, 1266);
+    ctx.fillText("20 道核心题 · 必要时自适应加问 · 不收集个人信息", 300, 1266);
     ctx.font = "400 20px sans-serif";
     ctx.fillText("zhouying.cn/5lovelanguages", 300, 1307);
     ctx.fillStyle = "#b95548";
@@ -2282,7 +2240,7 @@ export default function Home() {
             {hasSavedProgress && (
               <div className="resume-notice">
                 <div>
-                  <b>上次答到了第 {index + 1} 题</b>
+                  <b>上次答到了第 {answers.length + 1} 题</b>
                   <span>进度只保存在这台设备，不会上传逐题答案。</span>
                 </div>
                 <button type="button" onClick={beginFreshQuiz}>
@@ -2294,7 +2252,7 @@ export default function Home() {
               {hasSavedProgress ? "继续上次测试" : "开始探索"}
             </button>
             <div className="meta">
-              <span>30 道情境三选一</span>
+              <span>20 道核心题 · 必要时加问</span>
               <i />
               <span>约 5 分钟</span>
             </div>
@@ -2339,8 +2297,14 @@ export default function Home() {
       </main>
     );
   if (phase === "quiz") {
-    const q = questions[index];
-    const done = answers.filter(Boolean).length;
+    if (adaptiveStep.type === "result") {
+      return null;
+    }
+    const q = adaptiveStep.question;
+    const done = answers.length;
+    const dimensionDone = answers.filter(
+      (answer) => answer.dimension === q.dimension,
+    ).length;
     return (
       <main className="quiz-page">
         <header className="quiz-head">
@@ -2348,33 +2312,36 @@ export default function Home() {
             <LoveMark /> 爱的五种语言
           </button>
           <div className="step-text">
-            {q.mode === "receive"
+            {q.dimension === "receive"
               ? "第一部分 · 你期待怎样被爱"
               : "第二部分 · 你习惯怎样去爱"}
           </div>
           <div className="count">
-            {String(index + 1).padStart(2, "0")} / {questions.length}
+            {String(dimensionDone + 1).padStart(2, "0")} / 最多 13
           </div>
         </header>
         <div className="progress">
-          <span style={{ width: `${(done / questions.length) * 100}%` }} />
+          <span style={{ width: `${Math.min((done / 26) * 100, 100)}%` }} />
         </div>
         <section className="question-wrap choice-wrap">
           <div className="question-no">
-            CHOICE {String(index + 1).padStart(2, "0")}
+            CHOICE {String(done + 1).padStart(2, "0")}
           </div>
-          <p className="choice-prompt">{q.scene}</p>
+          <p className="choice-prompt">{q.content}</p>
           <div
             className="binary-options"
             role="group"
             aria-label="请选择更符合你的一项，也可以选择两种都不符合"
           >
-            {q.options.map((option, optionIndex) => (
+            {[
+              { key: "A" as Choice, text: q.optionAText },
+              { key: "B" as Choice, text: q.optionBText },
+            ].map((option, optionIndex) => (
               <button
                 key={option.key}
                 type="button"
-                aria-pressed={answers[index] === option.key}
-                className={answers[index] === option.key ? "selected" : ""}
+                aria-pressed={false}
+                className=""
                 onClick={() => choose(option.key)}
               >
                 <small>{optionIndex === 0 ? "A" : "B"}</small>
@@ -2384,13 +2351,13 @@ export default function Home() {
             ))}
             <button
               type="button"
-              aria-pressed={answers[index] === "none"}
-              className={`neutral-choice ${answers[index] === "none" ? "selected" : ""}`}
-              onClick={() => choose("none")}
+              aria-pressed={false}
+              className="neutral-choice"
+              onClick={() => choose("C")}
             >
               <small>C</small>
               <strong>
-                {q.mode === "receive"
+                {q.dimension === "receive"
                   ? "这两种都不太能打动我。"
                   : "这两种都不是我常用的表达方式。"}
               </strong>
@@ -2398,70 +2365,19 @@ export default function Home() {
             </button>
           </div>
           <p className="choice-note">
-            {q.mode === "receive"
+            {q.dimension === "receive"
               ? "选择在真实生活里更容易打动你的那一个"
               : "回想最近一个月，选择你更经常、也更自然会做的那一个"}
           </p>
           <div className="quiz-actions">
-            <button disabled={index === 0} onClick={() => setIndex(index - 1)}>
+            <button
+              disabled={answers.length === 0}
+              onClick={() => setAnswers((current) => current.slice(0, -1))}
+            >
               ← 上一题
             </button>
             <span>没有标准答案，凭第一感觉选择</span>
-            <button
-              disabled={!answers[index] || index === questions.length - 1}
-              onClick={() => setIndex(index + 1)}
-            >
-              下一题 →
-            </button>
-          </div>
-        </section>
-      </main>
-    );
-  }
-  if (phase === "tiebreak") {
-    const group = tieGroups[tieGroupIndex];
-    const challenger = group.candidates[tieOpponentIndex];
-    const champion = tieChampion ?? group.candidates[0];
-    return (
-      <main className="quiz-page tie-page">
-        <header className="quiz-head">
-          <div className="mini-brand">
-            <LoveMark /> 爱的五种语言
-          </div>
-          <div className="step-text">
-            再靠近一点 ·{" "}
-            {group.mode === "receive" ? "我如何接收爱" : "我如何给予爱"}
-          </div>
-          <div className="count">
-            {tieDone + 1} / {tieTotal}
-          </div>
-        </header>
-        <div className="progress">
-          <span style={{ width: `${((tieDone + 1) / tieTotal) * 100}%` }} />
-        </div>
-        <section className="question-wrap tie-wrap">
-          <div className="question-no">A GENTLE TIEBREAKER</div>
-          <h1>
-            如果此刻只能保留一种，
-            <br />
-            哪一个对你更重要？
-          </h1>
-          <p>这一题的选择会继续迎战下一个接近类型，直到产生明确的核心偏好。</p>
-          <div className="tie-options">
-            <button onClick={() => chooseTie(champion)}>
-              <small>{LOVE[champion].name}</small>
-              <strong>{tieCopy[group.mode][champion]}</strong>
-              <span>选择这个 →</span>
-            </button>
-            <i>或</i>
-            <button onClick={() => chooseTie(challenger)}>
-              <small>{LOVE[challenger].name}</small>
-              <strong>{tieCopy[group.mode][challenger]}</strong>
-              <span>选择这个 →</span>
-            </button>
-          </div>
-          <div className="tie-note">
-            胜出的选择会进入下一轮；最终胜者将成为结果页的“决胜后核心偏好”
+            <button disabled>选择后自动进入下一题 →</button>
           </div>
         </section>
       </main>
@@ -2471,25 +2387,20 @@ export default function Home() {
     typeof navigator !== "undefined" &&
     (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
-  const receiveLeaders = receive.filter(
-    (item) => item.score === receive[0].score,
+  const receivePrimary = new Set(
+    receiveRanking.possiblePrimaryLanguages.map((item) => LANGUAGE_TO_LOVE[item]),
   );
-  const giveLeaders = give.filter((item) => item.score === give[0].score);
+  const givePrimary = new Set(
+    giveRanking.possiblePrimaryLanguages.map((item) => LANGUAGE_TO_LOVE[item]),
+  );
+  const receiveLeaders = receive.filter((item) => receivePrimary.has(item.key));
+  const giveLeaders = give.filter((item) => givePrimary.has(item.key));
   const hasTiedCore = receiveLeaders.length > 1 || giveLeaders.length > 1;
   const personalResult = PERSONAL_RESULT[`${receive[0].key}-${give[0].key}`];
-  const resultLowSignal =
-    receive.reduce((sum, item) => sum + item.score, 0) <= 7 ||
-    give.reduce((sum, item) => sum + item.score, 0) <= 7 ||
-    receive[0].score <= 2 ||
-    give[0].score <= 2;
-  const relationshipTitle = resultLowSignal
-    ? "这次结果更像一张情境地图，而不是单一标签。"
-    : hasTiedCore
+  const relationshipTitle = hasTiedCore
       ? "你的核心偏好不止一种。"
       : personalResult.title;
-  const relationshipCopy = resultLowSignal
-    ? "你明确选择了较多“都不符合”。你感受和表达爱，可能更取决于对象、关系阶段与当下情境，也可能有测试尚未覆盖的重要方式。"
-    : hasTiedCore
+  const relationshipCopy = hasTiedCore
       ? `你在${receiveLeaders.length > 1 ? "接收爱" : "表达爱"}的方向上出现并列核心偏好。它们同样重要，不需要从中强行挑出一个代表你。`
       : personalResult.body;
   return (
@@ -2510,18 +2421,25 @@ export default function Home() {
       <div className="result-grid">
         <ResultList
           title={LOVE[receive[0].key].name}
-          eyebrow="我喜欢这样被爱"
+          eyebrow="期待被爱的排序"
           data={receive}
           mode="receive"
+          ranking={receiveRanking}
         />
         <ResultList
           title={LOVE[give[0].key].name}
-          eyebrow="我愿意这样去爱"
+          eyebrow="习惯去爱的排序"
           data={give}
           mode="give"
+          ranking={giveRanking}
         />
       </div>
-      <DetailedReport receive={receive} give={give} />
+      <DetailedReport
+        receive={receive}
+        give={give}
+        receiveRanking={receiveRanking}
+        giveRanking={giveRanking}
+      />
       {inviterProfile ? (
         <MatchReport
           inviter={inviterProfile}
