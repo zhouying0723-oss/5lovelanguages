@@ -808,7 +808,7 @@ nav,
 }
 .pie-legend > div {
   display: grid;
-  grid-template-columns: 10px 1fr 34px;
+  grid-template-columns: 24px 1fr 80px;
   align-items: center;
   gap: 8px;
   margin: 10px 0;
@@ -816,9 +816,19 @@ nav,
   font-size: 11px;
 }
 .pie-legend i {
+  display: grid;
+  place-items: center;
   width: 9px;
   height: 9px;
   border-radius: 50%;
+}
+.pie-legend .rank-icon {
+  width: 24px;
+  height: 24px;
+  color: #fff;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
 }
 .pie-legend b {
   text-align: right;

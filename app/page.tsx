@@ -1451,11 +1451,19 @@ function ResultList({
       {primaryKeys.length > 1 && (
         <p className="ranking-note">首要偏好非常接近，现有答案暂未稳定分出先后。</p>
       )}
+      {primaryKeys.length === 1 && (
+        <p className="ranking-note">{LOVE[primaryKeys[0]][eyebrow.includes("被爱") ? "receive" : "give"]}</p>
+      )}
       <div className="pie-result ranking-result">
         <div className="pie-legend">
           {remaining.map((item) => (
             <div key={item.key}>
-              <i style={{ background: LOVE[item.key].color }} />
+              <i
+                className="rank-icon"
+                style={{ background: LOVE[item.key].color }}
+              >
+                {item.minRank}
+              </i>
               <span>{LOVE[item.key].name}</span>
               <b>
                 {item.minRank === item.maxRank
@@ -2393,7 +2401,7 @@ export default function Home() {
             <p>LOVE, TOGETHER</p>
             <h2>邀请另一半，看看爱有没有被彼此接住</h2>
             <span>
-              邀请对方完成测试，生成你们的匹配度报告，获得专属相处指南。
+              邀请对方完成测试，生成你们的爱语双向报告，看见彼此如何接收和表达爱。
             </span>
           </div>
           <button className="primary" onClick={shareMatchInvite}>
@@ -2407,18 +2415,6 @@ export default function Home() {
           <span>给你的关系提示</span>
           <h2>{relationshipTitle}</h2>
           <p>{relationshipCopy}</p>
-        </div>
-      </section>
-      <section className="all-loves">
-        <h2>五种爱的语言，没有高低之分</h2>
-        <div>
-          {(Object.keys(LOVE) as LoveKey[]).map((k) => (
-            <article key={k}>
-              <i style={{ background: LOVE[k].color }} />
-              <h3>{LOVE[k].name}</h3>
-              <p>{LOVE[k].desc}</p>
-            </article>
-          ))}
         </div>
       </section>
       <section className="share">
