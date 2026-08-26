@@ -1432,53 +1432,28 @@ function ResultList({
   title,
   eyebrow,
   data,
-  mode,
   ranking,
 }: {
   title: string;
   eyebrow: string;
   data: DisplayRankingItem[];
-  mode: "receive" | "give";
   ranking: RankingResult;
 }) {
   const primaryKeys = ranking.possiblePrimaryLanguages.map(
     (language) => LANGUAGE_TO_LOVE[language],
   );
   const primaryNames = primaryKeys.map((key) => LOVE[key].name).join(" 或 ");
+  const remaining = data.filter((item) => !primaryKeys.includes(item.key));
   return (
     <section className="result-card">
       <span className="result-eyebrow">{eyebrow}</span>
-      <h2>
-        {primaryKeys.length > 1 ? "首要偏好非常接近" : title}
-      </h2>
-      <div
-        className="primary-love"
-        style={
-          {
-            "--accent":
-              primaryKeys.length > 1 ? "#b95548" : LOVE[data[0].key].color,
-          } as React.CSSProperties
-        }
-      >
-        <div className="rank-mark">
-          {primaryKeys.length > 1 ? "≈" : "01"}
-        </div>
-        <div>
-          <strong>
-            {primaryKeys.length > 1
-              ? `你的首要爱的语言可能是${primaryNames}`
-              : LOVE[primaryKeys[0]].name}
-          </strong>
-          <p>
-            {primaryKeys.length > 1
-              ? "目前两者非常接近，现有答案还不足以稳定分出先后。"
-              : LOVE[data[0].key][mode]}
-          </p>
-        </div>
-      </div>
+      <h2>{primaryNames || title}</h2>
+      {primaryKeys.length > 1 && (
+        <p className="ranking-note">首要偏好非常接近，现有答案暂未稳定分出先后。</p>
+      )}
       <div className="pie-result ranking-result">
         <div className="pie-legend">
-          {data.map((item) => (
+          {remaining.map((item) => (
             <div key={item.key}>
               <i style={{ background: LOVE[item.key].color }} />
               <span>{LOVE[item.key].name}</span>
@@ -2384,14 +2359,12 @@ export default function Home() {
           title={LOVE[receive[0].key].name}
           eyebrow="期待被爱的排序"
           data={receive}
-          mode="receive"
           ranking={receiveRanking}
         />
         <ResultList
           title={LOVE[give[0].key].name}
           eyebrow="习惯去爱的排序"
           data={give}
-          mode="give"
           ranking={giveRanking}
         />
       </div>

@@ -781,6 +781,12 @@ nav,
 .ranking-result {
   grid-template-columns: 1fr;
 }
+.ranking-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
 .ranking-result .pie-legend b {
   width: auto;
   white-space: nowrap;
