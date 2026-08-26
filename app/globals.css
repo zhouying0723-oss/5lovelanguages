@@ -821,7 +821,7 @@ nav,
   font-size: 12px;
   line-height: 1.6;
 }
-.rank-flag {
+.rank-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -829,7 +829,7 @@ nav,
   width: 28px;
   height: 28px;
   color: var(--rose);
-  font-size: 23px;
+  font-size: 21px;
   font-style: normal;
   line-height: 1;
 }

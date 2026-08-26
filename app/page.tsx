@@ -1450,7 +1450,7 @@ function ResultList({
       <span className="result-eyebrow">{eyebrow}</span>
       <div className="ranking-list" role="list" aria-label={eyebrow}>
         <div className="ranking-row ranking-row-primary" role="listitem">
-          <span className="rank-flag" aria-hidden="true">⚑</span>
+          <span className="rank-mark" aria-hidden="true">✦</span>
           <b>{primaryRankLabel}</b>
           <h2>{primaryNames || title}</h2>
           <p>{primaryKeys.length > 1
@@ -1459,7 +1459,7 @@ function ResultList({
         </div>
         {data.filter((item) => !primaryKeys.includes(item.key)).map((item) => (
           <div className="ranking-row" key={item.key} role="listitem">
-            <span className="rank-flag" aria-hidden="true">⚑</span>
+            <span className="rank-mark" aria-hidden="true">✦</span>
             <b>{item.minRank === item.maxRank
               ? `第 ${item.minRank} 名`
               : `第 ${item.minRank}–${item.maxRank} 名`}</b>
