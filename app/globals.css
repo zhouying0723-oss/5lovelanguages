@@ -696,6 +696,97 @@ nav,
   color: var(--muted);
   line-height: 1.8;
 }
+.result-variant-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 auto 28px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.result-variant-switch button {
+  border: 1px solid #dfcec7;
+  border-radius: 999px;
+  padding: 7px 16px;
+  background: #fff;
+  color: var(--muted);
+  cursor: pointer;
+}
+.result-variant-switch button.active {
+  border-color: var(--rose);
+  background: var(--rose);
+  color: #fff;
+}
+.legacy-result-view {
+  max-width: 1120px;
+  margin: 0 auto 56px;
+  padding: 0 24px;
+}
+.legacy-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+.legacy-result-card,
+.legacy-result-summary {
+  padding: 30px;
+  border: 1px solid #eadbd4;
+  border-radius: 16px;
+  background: #fff;
+}
+.legacy-result-card h2 {
+  margin: 12px 0 8px;
+  color: var(--ink);
+  font: 700 28px "Songti SC", serif;
+}
+.legacy-result-copy {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.legacy-result-card ol {
+  margin: 0;
+  padding-left: 24px;
+}
+.legacy-result-card li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 0;
+  border-bottom: 1px solid #f1e7e2;
+  color: var(--ink);
+}
+.legacy-result-card li b {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.legacy-result-summary {
+  margin-top: 24px;
+}
+.legacy-result-summary h3 {
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.legacy-result-summary p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.8;
+}
+@media (max-width: 800px) {
+  .legacy-result-view {
+    padding: 0 14px;
+  }
+  .legacy-result-grid {
+    grid-template-columns: 1fr;
+  }
+  .legacy-result-card,
+  .legacy-result-summary {
+    padding: 22px;
+  }
+}
 .result-grid {
   max-width: 1080px;
   margin: auto;

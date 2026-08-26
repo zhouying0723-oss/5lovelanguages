@@ -1602,6 +1602,48 @@ function DetailedReport({
   );
 }
 
+function LegacyResultView({
+  receive,
+  give,
+}: {
+  receive: DisplayRankingItem[];
+  give: DisplayRankingItem[];
+}) {
+  const render = (items: DisplayRankingItem[], label: string) => (
+    <section className="legacy-result-card">
+      <span className="result-eyebrow">{label}</span>
+      <h2>{LOVE[items[0].key].name}</h2>
+      <p className="legacy-result-copy">这是你在这一方向上最常出现的偏好入口。</p>
+      <ol>
+        {items.map((item) => (
+          <li key={item.key}>
+            <span>{LOVE[item.key].name}</span>
+            <b>
+              {item.minRank === item.maxRank
+                ? `第 ${item.minRank} 名`
+                : `第 ${item.minRank}–${item.maxRank} 名`}
+            </b>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+  return (
+    <section className="legacy-result-view">
+      <div className="legacy-result-grid">
+        {render(receive, "我喜欢这样被爱")}
+        {render(give, "我愿意这样去爱")}
+      </div>
+      <div className="legacy-result-summary">
+        <h3>你的双向爱语</h3>
+        <p>
+          你倾向通过“{LOVE[receive[0].key].name}”感受爱，也更自然地用“{LOVE[give[0].key].name}”表达爱。把这份差异说清楚，能减少“明明在爱，却没有被收到”的错位。
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const inviteShareReady = useMemo(
     () =>
@@ -1618,6 +1660,7 @@ export default function Home() {
   );
   const savedProgress = useMemo(() => loadSavedProgress(), []);
   const [phase, setPhase] = useState<Phase>("intro");
+  const [resultVariant, setResultVariant] = useState<"new" | "old">("new");
   const [answers, setAnswers] = useState<AdaptiveAnswer[]>(
     savedProgress?.answers ?? [],
   );
@@ -2354,26 +2397,47 @@ export default function Home() {
           你的接收偏好与付出方式不必相同。差异不是问题，它是理解自己与重要之人的新入口。
         </p>
       </section>
-      <div className="result-grid">
-        <ResultList
-          title={LOVE[receive[0].key].name}
-          eyebrow="期待被爱的排序"
-          data={receive}
-          ranking={receiveRanking}
-        />
-        <ResultList
-          title={LOVE[give[0].key].name}
-          eyebrow="习惯去爱的排序"
-          data={give}
-          ranking={giveRanking}
-        />
+      <div className="result-variant-switch" role="group" aria-label="选择结果页版本">
+        <span>结果页版本</span>
+        <button
+          className={resultVariant === "new" ? "active" : ""}
+          onClick={() => setResultVariant("new")}
+        >
+          新版
+        </button>
+        <button
+          className={resultVariant === "old" ? "active" : ""}
+          onClick={() => setResultVariant("old")}
+        >
+          旧版
+        </button>
       </div>
-      <DetailedReport
-        receive={receive}
-        give={give}
-        receiveRanking={receiveRanking}
-        giveRanking={giveRanking}
-      />
+      {resultVariant === "new" ? (
+        <>
+          <div className="result-grid">
+            <ResultList
+              title={LOVE[receive[0].key].name}
+              eyebrow="期待被爱的排序"
+              data={receive}
+              ranking={receiveRanking}
+            />
+            <ResultList
+              title={LOVE[give[0].key].name}
+              eyebrow="习惯去爱的排序"
+              data={give}
+              ranking={giveRanking}
+            />
+          </div>
+          <DetailedReport
+            receive={receive}
+            give={give}
+            receiveRanking={receiveRanking}
+            giveRanking={giveRanking}
+          />
+        </>
+      ) : (
+        <LegacyResultView receive={receive} give={give} />
+      )}
       {inviterProfile ? (
         <MatchReport
           inviter={inviterProfile}
