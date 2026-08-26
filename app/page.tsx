@@ -2305,7 +2305,9 @@ export default function Home() {
           <div className="question-no">
             CHOICE {String(done + 1).padStart(2, "0")}
           </div>
-          <p className="choice-prompt">{q.content}</p>
+          <p className="choice-prompt">
+            {q.content.replace(/^第[一二三四五六七八九十百]+幕：\s*/, "")}
+          </p>
           <div
             className="binary-options"
             role="group"

@@ -577,10 +577,13 @@ nav,
 }
 .choice-prompt {
   margin: 20px auto 0 !important;
+  max-width: 780px !important;
+  white-space: pre-line;
   color: var(--ink) !important;
   font:
-    700 25px "Songti SC",
+    400 18px/2 "Songti SC",
     serif !important;
+  text-align: left;
 }
 .choice-note {
   margin: -27px 0 32px;
@@ -1484,8 +1487,9 @@ nav,
   }
   .choice-prompt {
     margin: 10px auto 0 !important;
-    font-size: 18px !important;
-    line-height: 1.55 !important;
+    padding: 0 8px;
+    font-size: 16px !important;
+    line-height: 1.9 !important;
   }
   .choice-note {
     margin: 12px 0 18px !important;
@@ -1584,8 +1588,8 @@ nav,
   }
 }
 .choice-prompt {
-  max-width: 720px;
-  line-height: 1.6 !important;
+  max-width: 780px !important;
+  line-height: 2 !important;
 }
 @media (max-width: 800px) {
   .music-toggle {
@@ -1614,8 +1618,8 @@ nav,
   }
 }
 .choice-prompt {
-  max-width: 720px;
-  line-height: 1.6 !important;
+  max-width: 780px !important;
+  line-height: 2 !important;
 }
 @media (max-width: 800px) {
   .pie-result {
@@ -2037,4 +2041,12 @@ nav,
 }
 .index-caption + .bars {
   margin-top: 10px;
+}
+
+@media (max-width: 800px) {
+  .choice-prompt {
+    max-width: 100% !important;
+    font-size: 16px !important;
+    line-height: 1.9 !important;
+  }
 }
