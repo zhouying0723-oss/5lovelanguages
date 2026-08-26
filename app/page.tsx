@@ -1988,7 +1988,7 @@ export default function Home() {
     ctx.fillText("扫码，发现你的爱的语言", 300, 1218);
     ctx.fillStyle = "#79635c";
     ctx.font = "400 23px 'PingFang SC', sans-serif";
-    ctx.fillText("20 道情境二选一 · 约 3 分钟 · 不收集个人信息", 300, 1266);
+    ctx.fillText("30 道情境二选一 · 约 3 分钟 · 不收集个人信息", 300, 1266);
     ctx.font = "400 20px sans-serif";
     ctx.fillText("zhouying.cn/5lovelanguages", 300, 1307);
     ctx.fillStyle = "#b95548";
