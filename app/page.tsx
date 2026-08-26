@@ -1240,33 +1240,48 @@ function toAdaptiveQuestion(
   };
 }
 
-const receiveCore = questions
-  .filter((question) => question.mode === "receive")
-  .slice(0, 10)
-  .map((question, index) => ({
-    ...toAdaptiveQuestion(
-      question,
-      `R${String(index + 1).padStart(2, "0")}`,
+function pairKey(a: LoveKey, b: LoveKey) {
+  return [a, b].sort().join("-");
+}
+
+function buildCoreQuestions(
+  source: Question[],
+  dimension: Dimension,
+  prefix: "R" | "G",
+) {
+  return CORE_PAIRS[dimension].map(([first, second], index) => {
+    const sourceQuestion = source.find(
+      (question) =>
+        question.mode === dimension &&
+        pairKey(question.options[0].key, question.options[1].key) ===
+          pairKey(LANGUAGE_TO_LOVE[first], LANGUAGE_TO_LOVE[second]),
+    );
+    if (!sourceQuestion) throw new Error(`Missing story for ${dimension} ${first}-${second}`);
+    const adaptive = toAdaptiveQuestion(
+      sourceQuestion,
+      `${prefix}${String(index + 1).padStart(2, "0")}`,
       index + 1,
-    ),
-    optionALanguage: CORE_PAIRS.receive[index][0],
-    optionBLanguage: CORE_PAIRS.receive[index][1],
-  }));
-const giveCore = questions
-  .filter((question) => question.mode === "give")
-  .slice(0, 10)
-  .map((question, index) => ({
-    ...toAdaptiveQuestion(
-      question,
-      `G${String(index + 1).padStart(2, "0")}`,
-      index + 1,
-    ),
-    optionALanguage: CORE_PAIRS.give[index][0],
-    optionBLanguage: CORE_PAIRS.give[index][1],
-  }));
+    );
+    const sourceFirst = LOVE_TO_LANGUAGE[sourceQuestion.options[0].key];
+    return sourceFirst === first
+      ? { ...adaptive, optionALanguage: first, optionBLanguage: second }
+      : {
+          ...adaptive,
+          optionALanguage: first,
+          optionBLanguage: second,
+          optionAText: sourceQuestion.options[1].text,
+          optionBText: sourceQuestion.options[0].text,
+        };
+  });
+}
+
+// The original long-form stories are the core experience. The shorter banks
+// remain available only as varied follow-up scenes.
+const receiveCore = buildCoreQuestions(legacyQuestions, "receive", "R");
+const giveCore = buildCoreQuestions(legacyQuestions, "give", "G");
 export const adaptiveCoreQuestions = [...receiveCore, ...giveCore];
 
-export const adaptiveFollowUpQuestions = [legacyQuestions, questionsV2].flatMap(
+export const adaptiveFollowUpQuestions = [questions, questionsV2].flatMap(
   (source, bankIndex) =>
     (["receive", "give"] as Dimension[]).flatMap((dimension) =>
       source
