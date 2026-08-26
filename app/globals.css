@@ -785,11 +785,20 @@ nav,
   width: 100%;
 }
 .ranking-result .pie-legend > div {
-  grid-template-columns: 30px minmax(0, 1fr) auto;
+  display: flex !important;
+  grid-template-columns: none;
   min-width: 0;
   gap: 12px;
   padding: 6px 0;
   font-size: 14px;
+}
+.ranking-result .pie-legend > div > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+.ranking-result .pie-legend > div > b {
+  flex: 0 0 80px;
 }
 .ranking-note {
   margin: 8px 0 0;
@@ -1439,7 +1448,7 @@ nav,
     font-size: 28px;
   }
   .ranking-result .pie-legend > div {
-    grid-template-columns: 30px minmax(0, 1fr) auto;
+    display: flex !important;
     font-size: 14px;
   }
   .detailed-report {
