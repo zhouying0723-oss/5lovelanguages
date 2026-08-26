@@ -142,3 +142,20 @@ export const rainStoryQuestions: Question[] = stories.map((story, index) => ({
   optionAText: story.optionAText,
   optionBText: story.optionBText,
 }));
+
+const fourthStory = rainStoryQuestions.find((question) => question.id === "R04");
+if (fourthStory) {
+  fourthStory.content = `第四幕：玻璃窗上的雨
+
+雨势稍缓后，你和TA走进附近的一家小餐馆。
+
+门一推开，温热的空气裹着食物的香气扑面而来。玻璃窗上蒙着一层薄薄的水汽，窗外的雨水顺着玻璃缓缓滑落。店里的说话声和碗碒轻碰的声音混在一起，让人渐渐放松下来。
+
+等餐时，你翻了翻手机里的待办清单。采购日用品、整理房间、处理几件拖了很久的杂事……每一件看起来都不大，堆在一起却让人有些喘不过气。
+
+你轻轻叹了口气：“事情怎么总也做不完。”
+
+这一刻，你更希望TA：`;
+  fourthStory.optionAText = "问你最近是不是一直绷得很紧，让你把心里的烦乱慢慢说出来。";
+  fourthStory.optionBText = "看看你的待办清单，说明天陪你一起把这些事情处理掉。";
+}
