@@ -781,6 +781,16 @@ nav,
 .ranking-result {
   grid-template-columns: 1fr;
 }
+.ranking-result .pie-legend {
+  width: 100%;
+}
+.ranking-result .pie-legend > div {
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  min-width: 0;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 14px;
+}
 .ranking-note {
   margin: 8px 0 0;
   color: var(--muted);
@@ -823,8 +833,8 @@ nav,
   border-radius: 50%;
 }
 .pie-legend .rank-icon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   color: #fff;
   font-size: 10px;
   font-style: normal;
@@ -1426,7 +1436,11 @@ nav,
     padding: 30px 22px;
   }
   .result-card h2 {
-    font-size: 30px;
+    font-size: 28px;
+  }
+  .ranking-result .pie-legend > div {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    font-size: 14px;
   }
   .detailed-report {
     margin: 48px 14px 20px;
