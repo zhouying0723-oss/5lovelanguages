@@ -16,6 +16,7 @@ import {
   type Language,
   type Question,
 } from "../app/adaptive-test.ts";
+import { rainStoryQuestions } from "../app/rain-stories.ts";
 
 const question = (
   id: string,
@@ -73,6 +74,21 @@ test("core questions use the required ten pair mappings per dimension", () => {
     ["Q", "W"], ["A", "G"], ["W", "T"], ["A", "Q"], ["T", "G"],
     ["G", "Q"], ["W", "A"], ["Q", "T"], ["T", "A"], ["G", "W"],
   ]);
+});
+
+test("the Rain After story bank contains all 20 original scenes", () => {
+  assert.equal(rainStoryQuestions.length, 20);
+  assert.equal(rainStoryQuestions[0].content.startsWith("第一幕：雨停以前"), true);
+  assert.equal(rainStoryQuestions[19].content.startsWith("第二十幕：看到它的时候"), true);
+  assert.deepEqual(
+    rainStoryQuestions.map((item) => [item.optionALanguage, item.optionBLanguage]),
+    [
+      ["W", "Q"], ["G", "A"], ["T", "W"], ["Q", "A"], ["G", "T"],
+      ["Q", "G"], ["A", "W"], ["T", "Q"], ["A", "T"], ["W", "G"],
+      ["Q", "W"], ["A", "G"], ["W", "T"], ["A", "Q"], ["T", "G"],
+      ["G", "Q"], ["W", "A"], ["Q", "T"], ["T", "A"], ["G", "W"],
+    ],
+  );
 });
 
 test("first question is R01", () => {

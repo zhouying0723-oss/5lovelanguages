@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 import {
   calculateResult,
-  CORE_PAIRS,
   createAnswer,
   getNextTestStep,
   type Answer as AdaptiveAnswer,
@@ -14,6 +13,7 @@ import {
   type Question as AdaptiveQuestion,
   type RankingResult,
 } from "./adaptive-test";
+import { rainStoryQuestions } from "./rain-stories";
 
 type LoveKey = "words" | "time" | "gifts" | "acts" | "touch";
 type Phase = "intro" | "quiz" | "result";
@@ -1240,46 +1240,9 @@ function toAdaptiveQuestion(
   };
 }
 
-function pairKey(a: LoveKey, b: LoveKey) {
-  return [a, b].sort().join("-");
-}
-
-function buildCoreQuestions(
-  source: Question[],
-  dimension: Dimension,
-  prefix: "R" | "G",
-) {
-  return CORE_PAIRS[dimension].map(([first, second], index) => {
-    const sourceQuestion = source.find(
-      (question) =>
-        question.mode === dimension &&
-        pairKey(question.options[0].key, question.options[1].key) ===
-          pairKey(LANGUAGE_TO_LOVE[first], LANGUAGE_TO_LOVE[second]),
-    );
-    if (!sourceQuestion) throw new Error(`Missing story for ${dimension} ${first}-${second}`);
-    const adaptive = toAdaptiveQuestion(
-      sourceQuestion,
-      `${prefix}${String(index + 1).padStart(2, "0")}`,
-      index + 1,
-    );
-    const sourceFirst = LOVE_TO_LANGUAGE[sourceQuestion.options[0].key];
-    return sourceFirst === first
-      ? { ...adaptive, optionALanguage: first, optionBLanguage: second }
-      : {
-          ...adaptive,
-          optionALanguage: first,
-          optionBLanguage: second,
-          optionAText: sourceQuestion.options[1].text,
-          optionBText: sourceQuestion.options[0].text,
-        };
-  });
-}
-
 // The original long-form stories are the core experience. The shorter banks
 // remain available only as varied follow-up scenes.
-const receiveCore = buildCoreQuestions(legacyQuestions, "receive", "R");
-const giveCore = buildCoreQuestions(legacyQuestions, "give", "G");
-export const adaptiveCoreQuestions = [...receiveCore, ...giveCore];
+export const adaptiveCoreQuestions = rainStoryQuestions;
 
 export const adaptiveFollowUpQuestions = [questions, questionsV2].flatMap(
   (source, bankIndex) =>
